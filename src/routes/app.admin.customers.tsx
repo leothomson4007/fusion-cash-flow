@@ -125,7 +125,7 @@ export function CustomerDialog({
     area: existing?.area ?? "",
     monthly_bill: existing?.monthly_bill ?? 1500,
     billing_day: existing?.billing_day ?? 1,
-    status: existing?.status ?? "active" as "active" | "inactive",
+    status: (existing?.status ?? "active") as "active" | "inactive",
     opening_balance: existing?.opening_balance ?? 0,
     notes: existing?.notes ?? "",
   });

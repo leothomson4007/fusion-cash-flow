@@ -13,6 +13,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAdminDashboardRouteImport } from './routes/app.admin.dashboard'
+import { Route as AppAdminCustomersRouteImport } from './routes/app.admin.customers'
+import { Route as AppAdminCustomersIdRouteImport } from './routes/app.admin.customers.$id'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -34,17 +37,38 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminDashboardRoute = AppAdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCustomersRoute = AppAdminCustomersRouteImport.update({
+  id: '/admin/customers',
+  path: '/admin/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCustomersIdRoute = AppAdminCustomersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppAdminCustomersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app': typeof AppIndexRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -52,13 +76,37 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/auth' | '/app/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/customers/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app'
-  id: '__root__' | '/' | '/app' | '/auth' | '/app/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/customers/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/customers/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,15 +145,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/dashboard': {
+      id: '/app/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/app/admin/dashboard'
+      preLoaderRoute: typeof AppAdminDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/customers': {
+      id: '/app/admin/customers'
+      path: '/admin/customers'
+      fullPath: '/app/admin/customers'
+      preLoaderRoute: typeof AppAdminCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/customers/$id': {
+      id: '/app/admin/customers/$id'
+      path: '/$id'
+      fullPath: '/app/admin/customers/$id'
+      preLoaderRoute: typeof AppAdminCustomersIdRouteImport
+      parentRoute: typeof AppAdminCustomersRoute
+    }
   }
 }
 
+interface AppAdminCustomersRouteChildren {
+  AppAdminCustomersIdRoute: typeof AppAdminCustomersIdRoute
+}
+
+const AppAdminCustomersRouteChildren: AppAdminCustomersRouteChildren = {
+  AppAdminCustomersIdRoute: AppAdminCustomersIdRoute,
+}
+
+const AppAdminCustomersRouteWithChildren =
+  AppAdminCustomersRoute._addFileChildren(AppAdminCustomersRouteChildren)
+
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminCustomersRoute: typeof AppAdminCustomersRouteWithChildren
+  AppAdminDashboardRoute: typeof AppAdminDashboardRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAdminCustomersRoute: AppAdminCustomersRouteWithChildren,
+  AppAdminDashboardRoute: AppAdminDashboardRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
