@@ -8,7 +8,7 @@ export const Route = createFileRoute("/app/")({
 function AppIndex() {
   const { role, loading } = useAuth();
   if (loading) return null;
-  if (role === "admin") return <Navigate to="/admin/dashboard" replace />;
-  if (role === "collector") return <Navigate to="/collector/dashboard" replace />;
+  if (role === "admin") return <Navigate to="/app/admin/dashboard" replace />;
+  if (role === "collector") return <Navigate to="/app/collector/dashboard" replace />;
   return null;
 }
