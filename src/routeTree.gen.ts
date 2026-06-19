@@ -9,38 +9,236 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppCollectorSubmitCashRouteImport } from './routes/app.collector.submit-cash'
+import { Route as AppCollectorNewReceiptRouteImport } from './routes/app.collector.new-receipt'
+import { Route as AppCollectorHistoryRouteImport } from './routes/app.collector.history'
+import { Route as AppCollectorDashboardRouteImport } from './routes/app.collector.dashboard'
+import { Route as AppAdminStaffRouteImport } from './routes/app.admin.staff'
+import { Route as AppAdminReportsRouteImport } from './routes/app.admin.reports'
+import { Route as AppAdminReceiptsRouteImport } from './routes/app.admin.receipts'
+import { Route as AppAdminDashboardRouteImport } from './routes/app.admin.dashboard'
+import { Route as AppAdminCustomersRouteImport } from './routes/app.admin.customers'
+import { Route as AppAdminCashRouteImport } from './routes/app.admin.cash'
+import { Route as AppAdminAuditRouteImport } from './routes/app.admin.audit'
+import { Route as AppAdminCustomersIdRouteImport } from './routes/app.admin.customers.$id'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorSubmitCashRoute = AppCollectorSubmitCashRouteImport.update({
+  id: '/collector/submit-cash',
+  path: '/collector/submit-cash',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorNewReceiptRoute = AppCollectorNewReceiptRouteImport.update({
+  id: '/collector/new-receipt',
+  path: '/collector/new-receipt',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorHistoryRoute = AppCollectorHistoryRouteImport.update({
+  id: '/collector/history',
+  path: '/collector/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorDashboardRoute = AppCollectorDashboardRouteImport.update({
+  id: '/collector/dashboard',
+  path: '/collector/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminStaffRoute = AppAdminStaffRouteImport.update({
+  id: '/admin/staff',
+  path: '/admin/staff',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminReportsRoute = AppAdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminReceiptsRoute = AppAdminReceiptsRouteImport.update({
+  id: '/admin/receipts',
+  path: '/admin/receipts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminDashboardRoute = AppAdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCustomersRoute = AppAdminCustomersRouteImport.update({
+  id: '/admin/customers',
+  path: '/admin/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCashRoute = AppAdminCashRouteImport.update({
+  id: '/admin/cash',
+  path: '/admin/cash',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminAuditRoute = AppAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCustomersIdRoute = AppAdminCustomersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppAdminCustomersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
+  '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
+  '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
+  '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
+    | '/app/admin/customers/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
+    | '/app/admin/customers/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
+    | '/app/admin/customers'
+    | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
+    | '/app/admin/customers/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +246,148 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/submit-cash': {
+      id: '/app/collector/submit-cash'
+      path: '/collector/submit-cash'
+      fullPath: '/app/collector/submit-cash'
+      preLoaderRoute: typeof AppCollectorSubmitCashRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/new-receipt': {
+      id: '/app/collector/new-receipt'
+      path: '/collector/new-receipt'
+      fullPath: '/app/collector/new-receipt'
+      preLoaderRoute: typeof AppCollectorNewReceiptRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/history': {
+      id: '/app/collector/history'
+      path: '/collector/history'
+      fullPath: '/app/collector/history'
+      preLoaderRoute: typeof AppCollectorHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/dashboard': {
+      id: '/app/collector/dashboard'
+      path: '/collector/dashboard'
+      fullPath: '/app/collector/dashboard'
+      preLoaderRoute: typeof AppCollectorDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/staff': {
+      id: '/app/admin/staff'
+      path: '/admin/staff'
+      fullPath: '/app/admin/staff'
+      preLoaderRoute: typeof AppAdminStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/reports': {
+      id: '/app/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/app/admin/reports'
+      preLoaderRoute: typeof AppAdminReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/receipts': {
+      id: '/app/admin/receipts'
+      path: '/admin/receipts'
+      fullPath: '/app/admin/receipts'
+      preLoaderRoute: typeof AppAdminReceiptsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/dashboard': {
+      id: '/app/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/app/admin/dashboard'
+      preLoaderRoute: typeof AppAdminDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/customers': {
+      id: '/app/admin/customers'
+      path: '/admin/customers'
+      fullPath: '/app/admin/customers'
+      preLoaderRoute: typeof AppAdminCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/cash': {
+      id: '/app/admin/cash'
+      path: '/admin/cash'
+      fullPath: '/app/admin/cash'
+      preLoaderRoute: typeof AppAdminCashRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/audit': {
+      id: '/app/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/app/admin/audit'
+      preLoaderRoute: typeof AppAdminAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/customers/$id': {
+      id: '/app/admin/customers/$id'
+      path: '/$id'
+      fullPath: '/app/admin/customers/$id'
+      preLoaderRoute: typeof AppAdminCustomersIdRouteImport
+      parentRoute: typeof AppAdminCustomersRoute
+    }
   }
 }
 
+interface AppAdminCustomersRouteChildren {
+  AppAdminCustomersIdRoute: typeof AppAdminCustomersIdRoute
+}
+
+const AppAdminCustomersRouteChildren: AppAdminCustomersRouteChildren = {
+  AppAdminCustomersIdRoute: AppAdminCustomersIdRoute,
+}
+
+const AppAdminCustomersRouteWithChildren =
+  AppAdminCustomersRoute._addFileChildren(AppAdminCustomersRouteChildren)
+
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+  AppAdminAuditRoute: typeof AppAdminAuditRoute
+  AppAdminCashRoute: typeof AppAdminCashRoute
+  AppAdminCustomersRoute: typeof AppAdminCustomersRouteWithChildren
+  AppAdminDashboardRoute: typeof AppAdminDashboardRoute
+  AppAdminReceiptsRoute: typeof AppAdminReceiptsRoute
+  AppAdminReportsRoute: typeof AppAdminReportsRoute
+  AppAdminStaffRoute: typeof AppAdminStaffRoute
+  AppCollectorDashboardRoute: typeof AppCollectorDashboardRoute
+  AppCollectorHistoryRoute: typeof AppCollectorHistoryRoute
+  AppCollectorNewReceiptRoute: typeof AppCollectorNewReceiptRoute
+  AppCollectorSubmitCashRoute: typeof AppCollectorSubmitCashRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+  AppAdminAuditRoute: AppAdminAuditRoute,
+  AppAdminCashRoute: AppAdminCashRoute,
+  AppAdminCustomersRoute: AppAdminCustomersRouteWithChildren,
+  AppAdminDashboardRoute: AppAdminDashboardRoute,
+  AppAdminReceiptsRoute: AppAdminReceiptsRoute,
+  AppAdminReportsRoute: AppAdminReportsRoute,
+  AppAdminStaffRoute: AppAdminStaffRoute,
+  AppCollectorDashboardRoute: AppCollectorDashboardRoute,
+  AppCollectorHistoryRoute: AppCollectorHistoryRoute,
+  AppCollectorNewReceiptRoute: AppCollectorNewReceiptRoute,
+  AppCollectorSubmitCashRoute: AppCollectorSubmitCashRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
