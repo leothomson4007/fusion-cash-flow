@@ -45,7 +45,7 @@ function AuditPage() {
                   <span className="text-muted-foreground ml-auto">{formatDateTime(l.created_at)}</span>
                 </div>
                 {l.reason && <div className="text-xs italic text-muted-foreground">Reason: {l.reason}</div>}
-                {(l.old_data || l.new_data) && (
+                {Boolean(l.old_data || l.new_data) && (
                   <details className="text-xs">
                     <summary className="cursor-pointer text-primary">View diff</summary>
                     <div className="grid gap-2 md:grid-cols-2 mt-2">

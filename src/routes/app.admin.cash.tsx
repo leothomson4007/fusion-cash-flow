@@ -117,7 +117,7 @@ function VerifyDialog({ sub, onDone }: { sub: Sub; onDone: () => void }) {
     setSaving(true);
     const { error } = await supabase.rpc("verify_cash", {
       _id: sub.id, _received: Number(received), _notes: notes || null,
-    });
+    } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Verified");
