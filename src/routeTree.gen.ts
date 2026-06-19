@@ -13,6 +13,10 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppCollectorSubmitCashRouteImport } from './routes/app.collector.submit-cash'
+import { Route as AppCollectorNewReceiptRouteImport } from './routes/app.collector.new-receipt'
+import { Route as AppCollectorHistoryRouteImport } from './routes/app.collector.history'
+import { Route as AppCollectorDashboardRouteImport } from './routes/app.collector.dashboard'
 import { Route as AppAdminStaffRouteImport } from './routes/app.admin.staff'
 import { Route as AppAdminReportsRouteImport } from './routes/app.admin.reports'
 import { Route as AppAdminReceiptsRouteImport } from './routes/app.admin.receipts'
@@ -40,6 +44,26 @@ const IndexRoute = IndexRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorSubmitCashRoute = AppCollectorSubmitCashRouteImport.update({
+  id: '/collector/submit-cash',
+  path: '/collector/submit-cash',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorNewReceiptRoute = AppCollectorNewReceiptRouteImport.update({
+  id: '/collector/new-receipt',
+  path: '/collector/new-receipt',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorHistoryRoute = AppCollectorHistoryRouteImport.update({
+  id: '/collector/history',
+  path: '/collector/history',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectorDashboardRoute = AppCollectorDashboardRouteImport.update({
+  id: '/collector/dashboard',
+  path: '/collector/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAdminStaffRoute = AppAdminStaffRouteImport.update({
@@ -95,6 +119,10 @@ export interface FileRoutesByFullPath {
   '/app/admin/receipts': typeof AppAdminReceiptsRoute
   '/app/admin/reports': typeof AppAdminReportsRoute
   '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesByTo {
@@ -108,6 +136,10 @@ export interface FileRoutesByTo {
   '/app/admin/receipts': typeof AppAdminReceiptsRoute
   '/app/admin/reports': typeof AppAdminReportsRoute
   '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesById {
@@ -123,6 +155,10 @@ export interface FileRoutesById {
   '/app/admin/receipts': typeof AppAdminReceiptsRoute
   '/app/admin/reports': typeof AppAdminReportsRoute
   '/app/admin/staff': typeof AppAdminStaffRoute
+  '/app/collector/dashboard': typeof AppCollectorDashboardRoute
+  '/app/collector/history': typeof AppCollectorHistoryRoute
+  '/app/collector/new-receipt': typeof AppCollectorNewReceiptRoute
+  '/app/collector/submit-cash': typeof AppCollectorSubmitCashRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRouteTypes {
@@ -139,6 +175,10 @@ export interface FileRouteTypes {
     | '/app/admin/receipts'
     | '/app/admin/reports'
     | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
     | '/app/admin/customers/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -152,6 +192,10 @@ export interface FileRouteTypes {
     | '/app/admin/receipts'
     | '/app/admin/reports'
     | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
     | '/app/admin/customers/$id'
   id:
     | '__root__'
@@ -166,6 +210,10 @@ export interface FileRouteTypes {
     | '/app/admin/receipts'
     | '/app/admin/reports'
     | '/app/admin/staff'
+    | '/app/collector/dashboard'
+    | '/app/collector/history'
+    | '/app/collector/new-receipt'
+    | '/app/collector/submit-cash'
     | '/app/admin/customers/$id'
   fileRoutesById: FileRoutesById
 }
@@ -203,6 +251,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/app/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/submit-cash': {
+      id: '/app/collector/submit-cash'
+      path: '/collector/submit-cash'
+      fullPath: '/app/collector/submit-cash'
+      preLoaderRoute: typeof AppCollectorSubmitCashRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/new-receipt': {
+      id: '/app/collector/new-receipt'
+      path: '/collector/new-receipt'
+      fullPath: '/app/collector/new-receipt'
+      preLoaderRoute: typeof AppCollectorNewReceiptRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/history': {
+      id: '/app/collector/history'
+      path: '/collector/history'
+      fullPath: '/app/collector/history'
+      preLoaderRoute: typeof AppCollectorHistoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/collector/dashboard': {
+      id: '/app/collector/dashboard'
+      path: '/collector/dashboard'
+      fullPath: '/app/collector/dashboard'
+      preLoaderRoute: typeof AppCollectorDashboardRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/admin/staff': {
@@ -284,6 +360,10 @@ interface AppRouteChildren {
   AppAdminReceiptsRoute: typeof AppAdminReceiptsRoute
   AppAdminReportsRoute: typeof AppAdminReportsRoute
   AppAdminStaffRoute: typeof AppAdminStaffRoute
+  AppCollectorDashboardRoute: typeof AppCollectorDashboardRoute
+  AppCollectorHistoryRoute: typeof AppCollectorHistoryRoute
+  AppCollectorNewReceiptRoute: typeof AppCollectorNewReceiptRoute
+  AppCollectorSubmitCashRoute: typeof AppCollectorSubmitCashRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -295,6 +375,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppAdminReceiptsRoute: AppAdminReceiptsRoute,
   AppAdminReportsRoute: AppAdminReportsRoute,
   AppAdminStaffRoute: AppAdminStaffRoute,
+  AppCollectorDashboardRoute: AppCollectorDashboardRoute,
+  AppCollectorHistoryRoute: AppCollectorHistoryRoute,
+  AppCollectorNewReceiptRoute: AppCollectorNewReceiptRoute,
+  AppCollectorSubmitCashRoute: AppCollectorSubmitCashRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
