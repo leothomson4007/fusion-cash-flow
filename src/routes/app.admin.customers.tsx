@@ -145,7 +145,7 @@ export function CustomerDialog({
       _status: form.status,
       _opening_balance: Number(form.opening_balance) || 0,
       _notes: form.notes || null,
-    });
+    } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success(existing ? "Customer updated" : "Customer added");
