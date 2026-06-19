@@ -34,9 +34,17 @@ export function CustomerSearch({
       }
       const { data } = await query;
       if (cancelled) return;
-      setRows((data ?? []) as CustomerLite[]);
+      const mapped: CustomerLite[] = ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+        id: String(r.customer_id),
+        customer_no: String(r.customer_no ?? ""),
+        full_name: String(r.full_name ?? ""),
+        phone: (r.phone as string | null) ?? null,
+        area: (r.area as string | null) ?? null,
+        monthly_bill: Number(r.monthly_bill ?? 0),
+        balance: Number(r.balance ?? 0),
+      }));
+      setRows(mapped);
       setLoading(false);
-    }, 180);
     return () => { cancelled = true; clearTimeout(t); };
   }, [term]);
 
