@@ -13,8 +13,13 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAdminStaffRouteImport } from './routes/app.admin.staff'
+import { Route as AppAdminReportsRouteImport } from './routes/app.admin.reports'
+import { Route as AppAdminReceiptsRouteImport } from './routes/app.admin.receipts'
 import { Route as AppAdminDashboardRouteImport } from './routes/app.admin.dashboard'
 import { Route as AppAdminCustomersRouteImport } from './routes/app.admin.customers'
+import { Route as AppAdminCashRouteImport } from './routes/app.admin.cash'
+import { Route as AppAdminAuditRouteImport } from './routes/app.admin.audit'
 import { Route as AppAdminCustomersIdRouteImport } from './routes/app.admin.customers.$id'
 
 const AuthRoute = AuthRouteImport.update({
@@ -37,6 +42,21 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminStaffRoute = AppAdminStaffRouteImport.update({
+  id: '/admin/staff',
+  path: '/admin/staff',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminReportsRoute = AppAdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminReceiptsRoute = AppAdminReceiptsRouteImport.update({
+  id: '/admin/receipts',
+  path: '/admin/receipts',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAdminDashboardRoute = AppAdminDashboardRouteImport.update({
   id: '/admin/dashboard',
   path: '/admin/dashboard',
@@ -45,6 +65,16 @@ const AppAdminDashboardRoute = AppAdminDashboardRouteImport.update({
 const AppAdminCustomersRoute = AppAdminCustomersRouteImport.update({
   id: '/admin/customers',
   path: '/admin/customers',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminCashRoute = AppAdminCashRouteImport.update({
+  id: '/admin/cash',
+  path: '/admin/cash',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminAuditRoute = AppAdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAdminCustomersIdRoute = AppAdminCustomersIdRouteImport.update({
@@ -58,16 +88,26 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
   '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
   '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
   '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
   '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRoutesById {
@@ -76,8 +116,13 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/': typeof AppIndexRoute
+  '/app/admin/audit': typeof AppAdminAuditRoute
+  '/app/admin/cash': typeof AppAdminCashRoute
   '/app/admin/customers': typeof AppAdminCustomersRouteWithChildren
   '/app/admin/dashboard': typeof AppAdminDashboardRoute
+  '/app/admin/receipts': typeof AppAdminReceiptsRoute
+  '/app/admin/reports': typeof AppAdminReportsRoute
+  '/app/admin/staff': typeof AppAdminStaffRoute
   '/app/admin/customers/$id': typeof AppAdminCustomersIdRoute
 }
 export interface FileRouteTypes {
@@ -87,16 +132,26 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
     | '/app/admin/customers'
     | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
     | '/app/admin/customers/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/app'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
     | '/app/admin/customers'
     | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
     | '/app/admin/customers/$id'
   id:
     | '__root__'
@@ -104,8 +159,13 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/'
+    | '/app/admin/audit'
+    | '/app/admin/cash'
     | '/app/admin/customers'
     | '/app/admin/dashboard'
+    | '/app/admin/receipts'
+    | '/app/admin/reports'
+    | '/app/admin/staff'
     | '/app/admin/customers/$id'
   fileRoutesById: FileRoutesById
 }
@@ -145,6 +205,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/admin/staff': {
+      id: '/app/admin/staff'
+      path: '/admin/staff'
+      fullPath: '/app/admin/staff'
+      preLoaderRoute: typeof AppAdminStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/reports': {
+      id: '/app/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/app/admin/reports'
+      preLoaderRoute: typeof AppAdminReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/receipts': {
+      id: '/app/admin/receipts'
+      path: '/admin/receipts'
+      fullPath: '/app/admin/receipts'
+      preLoaderRoute: typeof AppAdminReceiptsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/admin/dashboard': {
       id: '/app/admin/dashboard'
       path: '/admin/dashboard'
@@ -157,6 +238,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/customers'
       fullPath: '/app/admin/customers'
       preLoaderRoute: typeof AppAdminCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/cash': {
+      id: '/app/admin/cash'
+      path: '/admin/cash'
+      fullPath: '/app/admin/cash'
+      preLoaderRoute: typeof AppAdminCashRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/admin/audit': {
+      id: '/app/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/app/admin/audit'
+      preLoaderRoute: typeof AppAdminAuditRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/admin/customers/$id': {
@@ -182,14 +277,24 @@ const AppAdminCustomersRouteWithChildren =
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminAuditRoute: typeof AppAdminAuditRoute
+  AppAdminCashRoute: typeof AppAdminCashRoute
   AppAdminCustomersRoute: typeof AppAdminCustomersRouteWithChildren
   AppAdminDashboardRoute: typeof AppAdminDashboardRoute
+  AppAdminReceiptsRoute: typeof AppAdminReceiptsRoute
+  AppAdminReportsRoute: typeof AppAdminReportsRoute
+  AppAdminStaffRoute: typeof AppAdminStaffRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppAdminAuditRoute: AppAdminAuditRoute,
+  AppAdminCashRoute: AppAdminCashRoute,
   AppAdminCustomersRoute: AppAdminCustomersRouteWithChildren,
   AppAdminDashboardRoute: AppAdminDashboardRoute,
+  AppAdminReceiptsRoute: AppAdminReceiptsRoute,
+  AppAdminReportsRoute: AppAdminReportsRoute,
+  AppAdminStaffRoute: AppAdminStaffRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
