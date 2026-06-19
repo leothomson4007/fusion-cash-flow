@@ -45,6 +45,7 @@ export function CustomerSearch({
       }));
       setRows(mapped);
       setLoading(false);
+    }, 180);
     return () => { cancelled = true; clearTimeout(t); };
   }, [term]);
 
