@@ -17,20 +17,20 @@ import { cn } from "@/lib/utils";
 type NavItem = { title: string; to: string; icon: typeof Users };
 
 const ADMIN_NAV: NavItem[] = [
-  { title: "Dashboard", to: "/admin/dashboard", icon: LayoutDashboard },
-  { title: "Customers", to: "/admin/customers", icon: Users },
-  { title: "Receipts", to: "/admin/receipts", icon: Receipt },
-  { title: "Cash Verification", to: "/admin/cash", icon: Banknote },
-  { title: "Staff", to: "/admin/staff", icon: UserCog },
-  { title: "Reports", to: "/admin/reports", icon: FileBarChart },
-  { title: "Audit Log", to: "/admin/audit", icon: ShieldCheck },
+  { title: "Dashboard", to: "/app/admin/dashboard", icon: LayoutDashboard },
+  { title: "Customers", to: "/app/admin/customers", icon: Users },
+  { title: "Receipts", to: "/app/admin/receipts", icon: Receipt },
+  { title: "Cash", to: "/app/admin/cash", icon: Banknote },
+  { title: "Staff", to: "/app/admin/staff", icon: UserCog },
+  { title: "Reports", to: "/app/admin/reports", icon: FileBarChart },
+  { title: "Audit Log", to: "/app/admin/audit", icon: ShieldCheck },
 ];
 
 const COLLECTOR_NAV: NavItem[] = [
-  { title: "Dashboard", to: "/collector/dashboard", icon: LayoutDashboard },
-  { title: "New Receipt", to: "/collector/new-receipt", icon: Plus },
-  { title: "My History", to: "/collector/history", icon: History },
-  { title: "Submit Cash", to: "/collector/submit-cash", icon: ClipboardCheck },
+  { title: "Dashboard", to: "/app/collector/dashboard", icon: LayoutDashboard },
+  { title: "New Receipt", to: "/app/collector/new-receipt", icon: Plus },
+  { title: "History", to: "/app/collector/history", icon: History },
+  { title: "Submit Cash", to: "/app/collector/submit-cash", icon: ClipboardCheck },
 ];
 
 function FNLogo({ className }: { className?: string }) {
