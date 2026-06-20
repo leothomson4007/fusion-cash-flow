@@ -12,6 +12,7 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const auth = useAuth();
   const navigate = useNavigate();
+  useRealtimeInvalidate();
 
   useEffect(() => {
     if (!auth.loading && !auth.session) navigate({ to: "/auth", replace: true });
