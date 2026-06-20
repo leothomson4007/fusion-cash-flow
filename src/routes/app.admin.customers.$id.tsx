@@ -49,11 +49,36 @@ function CustomerDetail() {
   if (!customer?.customer) return <div className="text-sm text-muted-foreground">Loading…</div>;
   const c = customer.customer;
   const b = customer.balance;
+  const isDeleted = c.status === "deleted";
+
+  const doDelete = async () => {
+    if (!delReason.trim()) return toast.error("Reason required");
+    const { error } = await supabase.rpc("admin_delete_customer", { _id: id, _reason: delReason } as never);
+    if (error) return toast.error(error.message);
+    toast.success("Customer deleted");
+    setDelOpen(false);
+    qc.invalidateQueries();
+    navigate({ to: "/app/admin/customers" });
+  };
+  const doRestore = async () => {
+    const { error } = await supabase.rpc("admin_restore_customer", { _id: id } as never);
+    if (error) return toast.error(error.message);
+    toast.success("Customer restored");
+    qc.invalidateQueries();
+    refetch();
+  };
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Button asChild variant="ghost" size="sm"><Link to="/app/admin/customers"><ArrowLeft className="h-4 w-4 mr-1" />Back</Link></Button>
+        {isDeleted ? (
+          <Button variant="outline" size="sm" onClick={doRestore}><RotateCcw className="h-4 w-4 mr-1" />Restore</Button>
+        ) : (
+          <Button variant="outline" size="sm" className="text-destructive" onClick={() => setDelOpen(true)}>
+            <Trash2 className="h-4 w-4 mr-1" />Delete
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
