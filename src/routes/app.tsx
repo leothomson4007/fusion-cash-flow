@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/lib/auth";
 import { AppShell } from "@/components/app-shell";
 import { useEffect } from "react";
+import { useRealtimeInvalidate } from "@/hooks/use-realtime-invalidate";
 
 export const Route = createFileRoute("/app")({
   ssr: false,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const auth = useAuth();
   const navigate = useNavigate();
+  useRealtimeInvalidate();
 
   useEffect(() => {
     if (!auth.loading && !auth.session) navigate({ to: "/auth", replace: true });

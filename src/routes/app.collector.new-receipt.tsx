@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/app/collector/new-receipt")({
 
 function NewReceiptPage() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [customer, setCustomer] = useState<CustomerLite | null>(null);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
@@ -35,6 +37,7 @@ function NewReceiptPage() {
     if (error) return toast.error(error.message);
     const row = data as unknown as ReceiptForCard;
     setCreated({ ...row, customer: { customer_no: customer.customer_no, full_name: customer.full_name, phone: customer.phone } });
+    qc.invalidateQueries();
     toast.success("Receipt created");
   };
 
