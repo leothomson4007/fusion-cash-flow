@@ -94,13 +94,17 @@ function CustomerDetail() {
               monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day,
               status: (c.status === "deleted" ? "inactive" : c.status) as "active" | "inactive",
               opening_balance: Number(c.opening_balance), notes: c.notes,
+              service_type: c.service_type, package_name: c.package_name, internet_speed: c.internet_speed,
             }} onSaved={() => refetch()}>
               <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" />Edit</Button>
             </CustomerDialog>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 text-sm">
             <Field label="Address" value={c.address ?? "—"} />
-            <Field label="Status"><Badge>{c.status}</Badge></Field>
+            <Field label="Status"><Badge variant={isDeleted ? "destructive" : "default"}>{c.status}</Badge></Field>
+            <Field label="Service" value={serviceLabel(c.service_type)} />
+            <Field label="Package" value={c.package_name ?? "—"} />
+            <Field label="Speed" value={c.internet_speed ?? "—"} />
             <Field label="Monthly bill"><Money value={c.monthly_bill} /></Field>
             <Field label="Billing day" value={`${c.billing_day} of month`} />
             <Field label="Opening balance"><Money value={c.opening_balance} /></Field>
