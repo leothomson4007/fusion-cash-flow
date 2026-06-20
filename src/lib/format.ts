@@ -19,9 +19,15 @@ export function formatDateTime(value: string | Date | null | undefined): string 
   });
 }
 
+// Compute "today" boundaries in Asia/Karachi (PKT, fixed UTC+5, no DST)
+// so dashboard KPIs match the operator's local day regardless of browser timezone.
 export function todayRangeISO(): { from: string; to: string } {
+  const PKT_OFFSET_MIN = 5 * 60;
   const now = new Date();
-  const from = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
-  return { from, to };
+  // shift into PKT, take Y/M/D, then shift back to UTC
+  const pkt = new Date(now.getTime() + PKT_OFFSET_MIN * 60_000);
+  const y = pkt.getUTCFullYear(), m = pkt.getUTCMonth(), d = pkt.getUTCDate();
+  const fromMs = Date.UTC(y, m, d) - PKT_OFFSET_MIN * 60_000;
+  const toMs = Date.UTC(y, m, d + 1) - PKT_OFFSET_MIN * 60_000;
+  return { from: new Date(fromMs).toISOString(), to: new Date(toMs).toISOString() };
 }
