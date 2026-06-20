@@ -1,13 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CustomerDialog } from "./app.admin.customers";
 import { formatDateTime } from "@/lib/format";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/admin/customers/$id")({
   component: CustomerDetail,
