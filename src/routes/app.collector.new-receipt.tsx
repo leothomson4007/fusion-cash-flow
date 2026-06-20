@@ -18,6 +18,7 @@ export const Route = createFileRoute("/app/collector/new-receipt")({
 
 function NewReceiptPage() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const [customer, setCustomer] = useState<CustomerLite | null>(null);
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
