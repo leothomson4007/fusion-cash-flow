@@ -146,6 +146,7 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
   const [amount, setAmount] = useState(String(receipt.amount));
   const [ptype, setPtype] = useState(receipt.payment_type);
   const [note, setNote] = useState(receipt.note ?? "");
+  const [ref, setRef] = useState<string>("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -155,6 +156,7 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
     const { error } = await supabase.rpc("admin_update_receipt", {
       _id: receipt.id, _amount: Number(amount), _payment_type: ptype as never,
       _note: note || null, _reason: reason,
+      _payment_reference: ref || null,
     } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -178,6 +180,10 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
                 <SelectItem value="jazzcash">JazzCash</SelectItem>
               </SelectContent>
             </Select></div>
+          {ptype !== "cash" && (
+            <div className="space-y-1.5"><Label>Payment reference</Label>
+              <Input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="Transaction ID / reference" /></div>
+          )}
           <div className="space-y-1.5"><Label>Note</Label><Input value={note} onChange={(e) => setNote(e.target.value)} /></div>
           <div className="space-y-1.5"><Label>Reason for edit *</Label><Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why this edit?" /></div>
         </div>
