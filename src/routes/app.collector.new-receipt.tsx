@@ -37,6 +37,7 @@ function NewReceiptPage() {
     if (error) return toast.error(error.message);
     const row = data as unknown as ReceiptForCard;
     setCreated({ ...row, customer: { customer_no: customer.customer_no, full_name: customer.full_name, phone: customer.phone } });
+    qc.invalidateQueries();
     toast.success("Receipt created");
   };
 
