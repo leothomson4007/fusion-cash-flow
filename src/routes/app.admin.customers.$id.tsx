@@ -147,8 +147,28 @@ function CustomerDetail() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete customer?</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            The customer will be hidden from active lists. Their receipts, reports, and audit log remain intact and can be restored later.
+          </p>
+          <Input value={delReason} onChange={(e) => setDelReason(e.target.value)} placeholder="Reason for deletion" />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDelOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={doDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+function serviceLabel(s: string | null | undefined): string {
+  if (!s) return "—";
+  if (s === "internet_tv") return "Internet + TV";
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function Field({ label, value, children }: { label: string; value?: React.ReactNode; children?: React.ReactNode }) {
