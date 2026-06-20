@@ -146,6 +146,7 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
   const [amount, setAmount] = useState(String(receipt.amount));
   const [ptype, setPtype] = useState(receipt.payment_type);
   const [note, setNote] = useState(receipt.note ?? "");
+  const [ref, setRef] = useState<string>("");
   const [reason, setReason] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -155,6 +156,7 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
     const { error } = await supabase.rpc("admin_update_receipt", {
       _id: receipt.id, _amount: Number(amount), _payment_type: ptype as never,
       _note: note || null, _reason: reason,
+      _payment_reference: ref || null,
     } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -178,6 +180,10 @@ function EditReceiptDialog({ receipt, onDone }: { receipt: ReceiptRow; onDone: (
                 <SelectItem value="jazzcash">JazzCash</SelectItem>
               </SelectContent>
             </Select></div>
+          {ptype !== "cash" && (
+            <div className="space-y-1.5"><Label>Payment reference</Label>
+              <Input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="Transaction ID / reference" /></div>
+          )}
           <div className="space-y-1.5"><Label>Note</Label><Input value={note} onChange={(e) => setNote(e.target.value)} /></div>
           <div className="space-y-1.5"><Label>Reason for edit *</Label><Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Why this edit?" /></div>
         </div>
@@ -224,24 +230,26 @@ function NewReceiptDialog({ children, onCreated }: { children: React.ReactNode; 
   const [amount, setAmount] = useState("");
   const [ptype, setPtype] = useState("cash");
   const [note, setNote] = useState("");
+  const [ref, setRef] = useState("");
   const [created, setCreated] = useState<ReceiptRow | null>(null);
   const [saving, setSaving] = useState(false);
 
   const reset = () => {
-    setCustomerId(null); setCustomerName(""); setAmount(""); setPtype("cash"); setNote(""); setCreated(null);
+    setCustomerId(null); setCustomerName(""); setAmount(""); setPtype("cash"); setNote(""); setRef(""); setCreated(null);
   };
 
   const submit = async () => {
     if (!customerId) return toast.error("Pick a customer");
     if (!Number(amount) || Number(amount) <= 0) return toast.error("Enter amount");
+    if (ptype !== "cash" && !ref.trim()) return toast.error("Payment reference required for digital payments");
     setSaving(true);
     const { data, error } = await supabase.rpc("create_receipt", {
-      _customer_id: customerId, _amount: Number(amount), _payment_type: ptype as never, _note: note || null,
+      _customer_id: customerId, _amount: Number(amount), _payment_type: ptype as never,
+      _note: note || null, _payment_reference: ref || null,
     } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
     const row = data as unknown as ReceiptRow;
-    // attach customer info for card
     const { data: c } = await supabase.from("customers").select("customer_no,full_name,phone").eq("id", customerId).single();
     setCreated({ ...row, customer: c as ReceiptRow["customer"] });
     onCreated();
@@ -250,7 +258,7 @@ function NewReceiptDialog({ children, onCreated }: { children: React.ReactNode; 
   return (
     <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) reset(); }}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         {!created ? (
           <>
             <DialogHeader><DialogTitle>Create receipt</DialogTitle></DialogHeader>
@@ -277,6 +285,17 @@ function NewReceiptDialog({ children, onCreated }: { children: React.ReactNode; 
                     </SelectContent>
                   </Select></div>
               </div>
+              {ptype !== "cash" && (
+                <div className="space-y-1.5"><Label>
+                  {ptype === "bank" ? "Bank reference number" :
+                    ptype === "jazzcash" ? "JazzCash transaction ID" :
+                    "Easypaisa transaction ID"} *
+                </Label>
+                  <Input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="e.g. JC4587219" /></div>
+              )}
+              {ptype === "cash" && (
+                <p className="text-xs text-muted-foreground">A confirmation number (CONF-YYYY-NNNNNN) is generated automatically for cash receipts.</p>
+              )}
               <div className="space-y-1.5"><Label>Note (optional)</Label><Input value={note} onChange={(e) => setNote(e.target.value)} /></div>
             </div>
             <DialogFooter>

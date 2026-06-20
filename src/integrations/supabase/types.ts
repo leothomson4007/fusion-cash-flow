@@ -103,12 +103,16 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_no: string
+          deleted_at: string | null
           full_name: string
           id: string
+          internet_speed: string | null
           monthly_bill: number
           notes: string | null
           opening_balance: number
+          package_name: string | null
           phone: string | null
+          service_type: string | null
           status: Database["public"]["Enums"]["customer_status"]
           updated_at: string
         }
@@ -119,12 +123,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_no: string
+          deleted_at?: string | null
           full_name: string
           id?: string
+          internet_speed?: string | null
           monthly_bill?: number
           notes?: string | null
           opening_balance?: number
+          package_name?: string | null
           phone?: string | null
+          service_type?: string | null
           status?: Database["public"]["Enums"]["customer_status"]
           updated_at?: string
         }
@@ -135,12 +143,16 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_no?: string
+          deleted_at?: string | null
           full_name?: string
           id?: string
+          internet_speed?: string | null
           monthly_bill?: number
           notes?: string | null
           opening_balance?: number
+          package_name?: string | null
           phone?: string | null
+          service_type?: string | null
           status?: Database["public"]["Enums"]["customer_status"]
           updated_at?: string
         }
@@ -198,8 +210,11 @@ export type Database = {
           customer_id: string
           id: string
           note: string | null
+          payment_reference: string | null
           payment_type: Database["public"]["Enums"]["payment_type"]
+          previous_due: number | null
           receipt_no: string
+          remaining_due: number | null
           seq: number
           status: Database["public"]["Enums"]["receipt_status"]
           updated_at: string
@@ -214,8 +229,11 @@ export type Database = {
           customer_id: string
           id?: string
           note?: string | null
+          payment_reference?: string | null
           payment_type?: Database["public"]["Enums"]["payment_type"]
+          previous_due?: number | null
           receipt_no: string
+          remaining_due?: number | null
           seq: number
           status?: Database["public"]["Enums"]["receipt_status"]
           updated_at?: string
@@ -230,8 +248,11 @@ export type Database = {
           customer_id?: string
           id?: string
           note?: string | null
+          payment_reference?: string | null
           payment_type?: Database["public"]["Enums"]["payment_type"]
+          previous_due?: number | null
           receipt_no?: string
+          remaining_due?: number | null
           seq?: number
           status?: Database["public"]["Enums"]["receipt_status"]
           updated_at?: string
@@ -286,9 +307,12 @@ export type Database = {
           customer_id: string | null
           customer_no: string | null
           full_name: string | null
+          internet_speed: string | null
           monthly_bill: number | null
           opening_balance: number | null
+          package_name: string | null
           phone: string | null
+          service_type: string | null
           status: Database["public"]["Enums"]["customer_status"] | null
           total_paid: number | null
         }
@@ -300,9 +324,12 @@ export type Database = {
           customer_id?: string | null
           customer_no?: string | null
           full_name?: string | null
+          internet_speed?: string | null
           monthly_bill?: number | null
           opening_balance?: number | null
+          package_name?: string | null
           phone?: string | null
+          service_type?: string | null
           status?: Database["public"]["Enums"]["customer_status"] | null
           total_paid?: never
         }
@@ -314,9 +341,12 @@ export type Database = {
           customer_id?: string | null
           customer_no?: string | null
           full_name?: string | null
+          internet_speed?: string | null
           monthly_bill?: number | null
           opening_balance?: number | null
+          package_name?: string | null
           phone?: string | null
+          service_type?: string | null
           status?: Database["public"]["Enums"]["customer_status"] | null
           total_paid?: never
         }
@@ -335,8 +365,11 @@ export type Database = {
           customer_id: string
           id: string
           note: string | null
+          payment_reference: string | null
           payment_type: Database["public"]["Enums"]["payment_type"]
+          previous_due: number | null
           receipt_no: string
+          remaining_due: number | null
           seq: number
           status: Database["public"]["Enums"]["receipt_status"]
           updated_at: string
@@ -349,7 +382,65 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_delete_customer: {
+        Args: { _id: string; _reason: string }
+        Returns: {
+          address: string | null
+          area: string | null
+          billing_day: number
+          created_at: string
+          created_by: string | null
+          customer_no: string
+          deleted_at: string | null
+          full_name: string
+          id: string
+          internet_speed: string | null
+          monthly_bill: number
+          notes: string | null
+          opening_balance: number
+          package_name: string | null
+          phone: string | null
+          service_type: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_exists: { Args: never; Returns: boolean }
+      admin_restore_customer: {
+        Args: { _id: string }
+        Returns: {
+          address: string | null
+          area: string | null
+          billing_day: number
+          created_at: string
+          created_by: string | null
+          customer_no: string
+          deleted_at: string | null
+          full_name: string
+          id: string
+          internet_speed: string | null
+          monthly_bill: number
+          notes: string | null
+          opening_balance: number
+          package_name: string | null
+          phone: string | null
+          service_type: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_revoke_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -364,108 +455,233 @@ export type Database = {
         }
         Returns: undefined
       }
-      admin_update_receipt: {
-        Args: {
-          _amount: number
-          _id: string
-          _note: string
-          _payment_type: Database["public"]["Enums"]["payment_type"]
-          _reason: string
-        }
-        Returns: {
-          amount: number
-          cancelled_reason: string | null
-          collector_id: string | null
-          created_at: string
-          created_by: string
-          customer_id: string
-          id: string
-          note: string | null
-          payment_type: Database["public"]["Enums"]["payment_type"]
-          receipt_no: string
-          seq: number
-          status: Database["public"]["Enums"]["receipt_status"]
-          updated_at: string
-          year: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "receipts"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
-      admin_upsert_customer: {
-        Args: {
-          _address: string
-          _area: string
-          _billing_day: number
-          _full_name: string
-          _id: string
-          _monthly_bill: number
-          _notes: string
-          _opening_balance: number
-          _phone: string
-          _status: Database["public"]["Enums"]["customer_status"]
-        }
-        Returns: {
-          address: string | null
-          area: string | null
-          billing_day: number
-          created_at: string
-          created_by: string | null
-          customer_no: string
-          full_name: string
-          id: string
-          monthly_bill: number
-          notes: string | null
-          opening_balance: number
-          phone: string | null
-          status: Database["public"]["Enums"]["customer_status"]
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "customers"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      admin_update_receipt:
+        | {
+            Args: {
+              _amount: number
+              _id: string
+              _note: string
+              _payment_type: Database["public"]["Enums"]["payment_type"]
+              _reason: string
+            }
+            Returns: {
+              amount: number
+              cancelled_reason: string | null
+              collector_id: string | null
+              created_at: string
+              created_by: string
+              customer_id: string
+              id: string
+              note: string | null
+              payment_reference: string | null
+              payment_type: Database["public"]["Enums"]["payment_type"]
+              previous_due: number | null
+              receipt_no: string
+              remaining_due: number | null
+              seq: number
+              status: Database["public"]["Enums"]["receipt_status"]
+              updated_at: string
+              year: number
+            }
+            SetofOptions: {
+              from: "*"
+              to: "receipts"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: {
+              _amount: number
+              _id: string
+              _note: string
+              _payment_reference?: string
+              _payment_type: Database["public"]["Enums"]["payment_type"]
+              _reason: string
+            }
+            Returns: {
+              amount: number
+              cancelled_reason: string | null
+              collector_id: string | null
+              created_at: string
+              created_by: string
+              customer_id: string
+              id: string
+              note: string | null
+              payment_reference: string | null
+              payment_type: Database["public"]["Enums"]["payment_type"]
+              previous_due: number | null
+              receipt_no: string
+              remaining_due: number | null
+              seq: number
+              status: Database["public"]["Enums"]["receipt_status"]
+              updated_at: string
+              year: number
+            }
+            SetofOptions: {
+              from: "*"
+              to: "receipts"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+      admin_upsert_customer:
+        | {
+            Args: {
+              _address: string
+              _area: string
+              _billing_day: number
+              _full_name: string
+              _id: string
+              _monthly_bill: number
+              _notes: string
+              _opening_balance: number
+              _phone: string
+              _status: Database["public"]["Enums"]["customer_status"]
+            }
+            Returns: {
+              address: string | null
+              area: string | null
+              billing_day: number
+              created_at: string
+              created_by: string | null
+              customer_no: string
+              deleted_at: string | null
+              full_name: string
+              id: string
+              internet_speed: string | null
+              monthly_bill: number
+              notes: string | null
+              opening_balance: number
+              package_name: string | null
+              phone: string | null
+              service_type: string | null
+              status: Database["public"]["Enums"]["customer_status"]
+              updated_at: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "customers"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: {
+              _address: string
+              _area: string
+              _billing_day: number
+              _full_name: string
+              _id: string
+              _internet_speed?: string
+              _monthly_bill: number
+              _notes: string
+              _opening_balance: number
+              _package_name?: string
+              _phone: string
+              _service_type?: string
+              _status: Database["public"]["Enums"]["customer_status"]
+            }
+            Returns: {
+              address: string | null
+              area: string | null
+              billing_day: number
+              created_at: string
+              created_by: string | null
+              customer_no: string
+              deleted_at: string | null
+              full_name: string
+              id: string
+              internet_speed: string | null
+              monthly_bill: number
+              notes: string | null
+              opening_balance: number
+              package_name: string | null
+              phone: string | null
+              service_type: string | null
+              status: Database["public"]["Enums"]["customer_status"]
+              updated_at: string
+            }
+            SetofOptions: {
+              from: "*"
+              to: "customers"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       claim_first_admin: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
       collector_expected_cash: { Args: { _uid: string }; Returns: number }
-      create_receipt: {
-        Args: {
-          _amount: number
-          _customer_id: string
-          _note?: string
-          _payment_type?: Database["public"]["Enums"]["payment_type"]
-        }
-        Returns: {
-          amount: number
-          cancelled_reason: string | null
-          collector_id: string | null
-          created_at: string
-          created_by: string
-          customer_id: string
-          id: string
-          note: string | null
-          payment_type: Database["public"]["Enums"]["payment_type"]
-          receipt_no: string
-          seq: number
-          status: Database["public"]["Enums"]["receipt_status"]
-          updated_at: string
-          year: number
-        }
-        SetofOptions: {
-          from: "*"
-          to: "receipts"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
+      create_receipt:
+        | {
+            Args: {
+              _amount: number
+              _customer_id: string
+              _note?: string
+              _payment_type?: Database["public"]["Enums"]["payment_type"]
+            }
+            Returns: {
+              amount: number
+              cancelled_reason: string | null
+              collector_id: string | null
+              created_at: string
+              created_by: string
+              customer_id: string
+              id: string
+              note: string | null
+              payment_reference: string | null
+              payment_type: Database["public"]["Enums"]["payment_type"]
+              previous_due: number | null
+              receipt_no: string
+              remaining_due: number | null
+              seq: number
+              status: Database["public"]["Enums"]["receipt_status"]
+              updated_at: string
+              year: number
+            }
+            SetofOptions: {
+              from: "*"
+              to: "receipts"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
+        | {
+            Args: {
+              _amount: number
+              _customer_id: string
+              _note?: string
+              _payment_reference?: string
+              _payment_type?: Database["public"]["Enums"]["payment_type"]
+            }
+            Returns: {
+              amount: number
+              cancelled_reason: string | null
+              collector_id: string | null
+              created_at: string
+              created_by: string
+              customer_id: string
+              id: string
+              note: string | null
+              payment_reference: string | null
+              payment_type: Database["public"]["Enums"]["payment_type"]
+              previous_due: number | null
+              receipt_no: string
+              remaining_due: number | null
+              seq: number
+              status: Database["public"]["Enums"]["receipt_status"]
+              updated_at: string
+              year: number
+            }
+            SetofOptions: {
+              from: "*"
+              to: "receipts"
+              isOneToOne: true
+              isSetofReturn: false
+            }
+          }
       current_user_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
@@ -552,7 +768,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "collector"
-      customer_status: "active" | "inactive"
+      customer_status: "active" | "inactive" | "deleted"
       payment_type: "cash" | "bank" | "easypaisa" | "jazzcash"
       receipt_status: "active" | "cancelled"
       submission_status: "pending" | "verified"
@@ -684,7 +900,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "collector"],
-      customer_status: ["active", "inactive"],
+      customer_status: ["active", "inactive", "deleted"],
       payment_type: ["cash", "bank", "easypaisa", "jazzcash"],
       receipt_status: ["active", "cancelled"],
       submission_status: ["pending", "verified"],

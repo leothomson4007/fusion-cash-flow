@@ -1,13 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Money } from "@/components/money";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CustomerDialog } from "./app.admin.customers";
 import { formatDateTime } from "@/lib/format";
-import { ArrowLeft, Edit } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/admin/customers/$id")({
   component: CustomerDetail,
@@ -15,13 +19,17 @@ export const Route = createFileRoute("/app/admin/customers/$id")({
 
 function CustomerDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [delOpen, setDelOpen] = useState(false);
+  const [delReason, setDelReason] = useState("");
 
   const { data: customer, refetch } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
       const [{ data: c }, { data: b }] = await Promise.all([
         supabase.from("customers").select("*").eq("id", id).single(),
-        supabase.from("customer_balances").select("*").eq("customer_id", id).single(),
+        supabase.from("customer_balances").select("*").eq("customer_id", id).maybeSingle(),
       ]);
       return { customer: c, balance: b };
     },
@@ -41,11 +49,36 @@ function CustomerDetail() {
   if (!customer?.customer) return <div className="text-sm text-muted-foreground">Loading…</div>;
   const c = customer.customer;
   const b = customer.balance;
+  const isDeleted = c.status === "deleted";
+
+  const doDelete = async () => {
+    if (!delReason.trim()) return toast.error("Reason required");
+    const { error } = await supabase.rpc("admin_delete_customer", { _id: id, _reason: delReason } as never);
+    if (error) return toast.error(error.message);
+    toast.success("Customer deleted");
+    setDelOpen(false);
+    qc.invalidateQueries();
+    navigate({ to: "/app/admin/customers" });
+  };
+  const doRestore = async () => {
+    const { error } = await supabase.rpc("admin_restore_customer", { _id: id } as never);
+    if (error) return toast.error(error.message);
+    toast.success("Customer restored");
+    qc.invalidateQueries();
+    refetch();
+  };
 
   return (
     <div className="space-y-5 max-w-4xl">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Button asChild variant="ghost" size="sm"><Link to="/app/admin/customers"><ArrowLeft className="h-4 w-4 mr-1" />Back</Link></Button>
+        {isDeleted ? (
+          <Button variant="outline" size="sm" onClick={doRestore}><RotateCcw className="h-4 w-4 mr-1" />Restore</Button>
+        ) : (
+          <Button variant="outline" size="sm" className="text-destructive" onClick={() => setDelOpen(true)}>
+            <Trash2 className="h-4 w-4 mr-1" />Delete
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -58,15 +91,20 @@ function CustomerDetail() {
             </div>
             <CustomerDialog existing={{
               id: c.id, full_name: c.full_name, phone: c.phone, address: c.address, area: c.area,
-              monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day, status: c.status,
+              monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day,
+              status: (c.status === "deleted" ? "inactive" : c.status) as "active" | "inactive",
               opening_balance: Number(c.opening_balance), notes: c.notes,
+              service_type: c.service_type, package_name: c.package_name, internet_speed: c.internet_speed,
             }} onSaved={() => refetch()}>
               <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" />Edit</Button>
             </CustomerDialog>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 text-sm">
             <Field label="Address" value={c.address ?? "—"} />
-            <Field label="Status"><Badge>{c.status}</Badge></Field>
+            <Field label="Status"><Badge variant={isDeleted ? "destructive" : "default"}>{c.status}</Badge></Field>
+            <Field label="Service" value={serviceLabel(c.service_type)} />
+            <Field label="Package" value={c.package_name ?? "—"} />
+            <Field label="Speed" value={c.internet_speed ?? "—"} />
             <Field label="Monthly bill"><Money value={c.monthly_bill} /></Field>
             <Field label="Billing day" value={`${c.billing_day} of month`} />
             <Field label="Opening balance"><Money value={c.opening_balance} /></Field>
@@ -109,8 +147,28 @@ function CustomerDetail() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete customer?</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            The customer will be hidden from active lists. Their receipts, reports, and audit log remain intact and can be restored later.
+          </p>
+          <Input value={delReason} onChange={(e) => setDelReason(e.target.value)} placeholder="Reason for deletion" />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDelOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={doDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+function serviceLabel(s: string | null | undefined): string {
+  if (!s) return "—";
+  if (s === "internet_tv") return "Internet + TV";
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function Field({ label, value, children }: { label: string; value?: React.ReactNode; children?: React.ReactNode }) {

@@ -114,7 +114,12 @@ export function CustomerDialog({
   children, existing, onSaved,
 }: {
   children: React.ReactNode;
-  existing?: { id: string; full_name: string; phone: string | null; address: string | null; area: string | null; monthly_bill: number; billing_day: number; status: "active" | "inactive"; opening_balance: number; notes: string | null };
+  existing?: {
+    id: string; full_name: string; phone: string | null; address: string | null; area: string | null;
+    monthly_bill: number; billing_day: number; status: "active" | "inactive";
+    opening_balance: number; notes: string | null;
+    service_type?: string | null; package_name?: string | null; internet_speed?: string | null;
+  };
   onSaved?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -123,6 +128,9 @@ export function CustomerDialog({
     phone: existing?.phone ?? "",
     address: existing?.address ?? "",
     area: existing?.area ?? "",
+    service_type: existing?.service_type ?? "internet",
+    package_name: existing?.package_name ?? "",
+    internet_speed: existing?.internet_speed ?? "",
     monthly_bill: existing?.monthly_bill ?? 1500,
     billing_day: existing?.billing_day ?? 1,
     status: (existing?.status ?? "active") as "active" | "inactive",
@@ -145,6 +153,9 @@ export function CustomerDialog({
       _status: form.status,
       _opening_balance: Number(form.opening_balance) || 0,
       _notes: form.notes || null,
+      _service_type: form.service_type || null,
+      _package_name: form.package_name || null,
+      _internet_speed: form.internet_speed || null,
     } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -156,7 +167,7 @@ export function CustomerDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{existing ? "Edit customer" : "New customer"}</DialogTitle></DialogHeader>
         <div className="grid grid-cols-2 gap-3">
           <div className="col-span-2 space-y-1.5"><Label>Full name *</Label>
@@ -167,6 +178,19 @@ export function CustomerDialog({
             <Input value={form.area} onChange={(e) => setForm({ ...form, area: e.target.value })} /></div>
           <div className="col-span-2 space-y-1.5"><Label>Address</Label>
             <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} /></div>
+          <div className="space-y-1.5"><Label>Service type</Label>
+            <Select value={form.service_type} onValueChange={(v) => setForm({ ...form, service_type: v })}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="internet">Internet</SelectItem>
+                <SelectItem value="tv">TV</SelectItem>
+                <SelectItem value="internet_tv">Internet + TV</SelectItem>
+              </SelectContent>
+            </Select></div>
+          <div className="space-y-1.5"><Label>Package name</Label>
+            <Input value={form.package_name} onChange={(e) => setForm({ ...form, package_name: e.target.value })} placeholder="e.g. Home Pro" /></div>
+          <div className="space-y-1.5"><Label>Internet speed</Label>
+            <Input value={form.internet_speed} onChange={(e) => setForm({ ...form, internet_speed: e.target.value })} placeholder="e.g. 20 Mbps" /></div>
           <div className="space-y-1.5"><Label>Monthly bill (Rs.)</Label>
             <Input type="number" min={0} value={form.monthly_bill} onChange={(e) => setForm({ ...form, monthly_bill: Number(e.target.value) })} /></div>
           <div className="space-y-1.5"><Label>Billing day (1-28)</Label>
