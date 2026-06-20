@@ -19,13 +19,17 @@ export const Route = createFileRoute("/app/admin/customers/$id")({
 
 function CustomerDetail() {
   const { id } = Route.useParams();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [delOpen, setDelOpen] = useState(false);
+  const [delReason, setDelReason] = useState("");
 
   const { data: customer, refetch } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
       const [{ data: c }, { data: b }] = await Promise.all([
         supabase.from("customers").select("*").eq("id", id).single(),
-        supabase.from("customer_balances").select("*").eq("customer_id", id).single(),
+        supabase.from("customer_balances").select("*").eq("customer_id", id).maybeSingle(),
       ]);
       return { customer: c, balance: b };
     },
