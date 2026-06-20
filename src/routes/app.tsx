@@ -35,6 +35,14 @@ function AppLayout() {
         <div className="max-w-sm space-y-3">
           <h2 className="text-lg font-semibold">No role assigned</h2>
           <p className="text-sm text-muted-foreground">Ask an admin to assign you a role to access the app.</p>
+          <button
+            className="text-sm underline text-primary"
+            onClick={async () => {
+              const { supabase } = await import("@/integrations/supabase/client");
+              await supabase.auth.signOut();
+              navigate({ to: "/auth", replace: true });
+            }}
+          >Sign out</button>
         </div>
       </div>
     );
