@@ -58,7 +58,8 @@ function CustomerDetail() {
             </div>
             <CustomerDialog existing={{
               id: c.id, full_name: c.full_name, phone: c.phone, address: c.address, area: c.area,
-              monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day, status: c.status,
+              monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day,
+              status: (c.status === "deleted" ? "inactive" : c.status) as "active" | "inactive",
               opening_balance: Number(c.opening_balance), notes: c.notes,
             }} onSaved={() => refetch()}>
               <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" />Edit</Button>
