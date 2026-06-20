@@ -552,7 +552,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "collector"
-      customer_status: "active" | "inactive"
+      customer_status: "active" | "inactive" | "deleted"
       payment_type: "cash" | "bank" | "easypaisa" | "jazzcash"
       receipt_status: "active" | "cancelled"
       submission_status: "pending" | "verified"
@@ -684,7 +684,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "collector"],
-      customer_status: ["active", "inactive"],
+      customer_status: ["active", "inactive", "deleted"],
       payment_type: ["cash", "bank", "easypaisa", "jazzcash"],
       receipt_status: ["active", "cancelled"],
       submission_status: ["pending", "verified"],
