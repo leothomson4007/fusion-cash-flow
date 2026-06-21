@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, KeyRound, ShieldOff, Shield } from "lucide-react";
+import { Plus, KeyRound, ShieldOff, Shield, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { adminCreateUser, adminResetUserPassword } from "@/lib/admin.functions";
+import { adminCreateUser, adminResetUserPassword, adminUpdateUser, adminDeleteUser } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/app/admin/staff")({
   component: StaffPage,
