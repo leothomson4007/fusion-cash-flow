@@ -94,7 +94,7 @@ function CustomerDetail() {
               monthly_bill: Number(c.monthly_bill), billing_day: c.billing_day,
               status: (c.status === "deleted" ? "inactive" : c.status) as "active" | "inactive",
               opening_balance: Number(c.opening_balance), notes: c.notes,
-              service_type: c.service_type, package_name: c.package_name, internet_speed: c.internet_speed,
+              service_type: c.service_type, package_name: c.package_name,
             }} onSaved={() => refetch()}>
               <Button variant="outline" size="sm"><Edit className="h-4 w-4 mr-1" />Edit</Button>
             </CustomerDialog>
