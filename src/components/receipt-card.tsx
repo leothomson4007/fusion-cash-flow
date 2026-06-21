@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/money";
 import { formatMoney, formatDateTime } from "@/lib/format";
-import { Wifi, CheckCircle2, Ban, Download, Share2, Printer } from "lucide-react";
+import { Wifi, CheckCircle2, Ban, ImageDown, Share2, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
