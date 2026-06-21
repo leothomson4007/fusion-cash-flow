@@ -88,23 +88,24 @@ export function ReceiptCard({
     setTimeout(() => { w.print(); }, 350);
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadImage = async () => {
     setBusy(true);
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
+      const { default: html2canvas } = await import("html2canvas");
       const node = printRef.current;
       if (!node) return;
       const canvas = await html2canvas(node, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-      const img = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ unit: "pt", format: [canvas.width * 0.5, canvas.height * 0.5] });
-      pdf.addImage(img, "PNG", 0, 0, canvas.width * 0.5, canvas.height * 0.5);
-      pdf.save(`${receipt.receipt_no}.pdf`);
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${receipt.receipt_no}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Receipt image saved");
     } catch (e) {
       console.error(e);
-      toast.error("Couldn't generate PDF — try Print instead");
+      toast.error("Couldn't save image — try Print instead");
     } finally {
       setBusy(false);
     }
