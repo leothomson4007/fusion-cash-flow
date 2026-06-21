@@ -106,7 +106,6 @@ export type Database = {
           deleted_at: string | null
           full_name: string
           id: string
-          internet_speed: string | null
           monthly_bill: number
           notes: string | null
           opening_balance: number
@@ -126,7 +125,6 @@ export type Database = {
           deleted_at?: string | null
           full_name: string
           id?: string
-          internet_speed?: string | null
           monthly_bill?: number
           notes?: string | null
           opening_balance?: number
@@ -146,7 +144,6 @@ export type Database = {
           deleted_at?: string | null
           full_name?: string
           id?: string
-          internet_speed?: string | null
           monthly_bill?: number
           notes?: string | null
           opening_balance?: number
@@ -307,7 +304,6 @@ export type Database = {
           customer_id: string | null
           customer_no: string | null
           full_name: string | null
-          internet_speed: string | null
           monthly_bill: number | null
           opening_balance: number | null
           package_name: string | null
@@ -324,7 +320,6 @@ export type Database = {
           customer_id?: string | null
           customer_no?: string | null
           full_name?: string | null
-          internet_speed?: string | null
           monthly_bill?: number | null
           opening_balance?: number | null
           package_name?: string | null
@@ -341,7 +336,6 @@ export type Database = {
           customer_id?: string | null
           customer_no?: string | null
           full_name?: string | null
-          internet_speed?: string | null
           monthly_bill?: number | null
           opening_balance?: number | null
           package_name?: string | null
@@ -394,7 +388,6 @@ export type Database = {
           deleted_at: string | null
           full_name: string
           id: string
-          internet_speed: string | null
           monthly_bill: number
           notes: string | null
           opening_balance: number
@@ -424,7 +417,6 @@ export type Database = {
           deleted_at: string | null
           full_name: string
           id: string
-          internet_speed: string | null
           monthly_bill: number
           notes: string | null
           opening_balance: number
@@ -549,7 +541,6 @@ export type Database = {
               deleted_at: string | null
               full_name: string
               id: string
-              internet_speed: string | null
               monthly_bill: number
               notes: string | null
               opening_balance: number
@@ -592,7 +583,6 @@ export type Database = {
               deleted_at: string | null
               full_name: string
               id: string
-              internet_speed: string | null
               monthly_bill: number
               notes: string | null
               opening_balance: number
