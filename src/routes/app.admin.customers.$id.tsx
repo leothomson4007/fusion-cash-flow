@@ -104,7 +104,6 @@ function CustomerDetail() {
             <Field label="Status"><Badge variant={isDeleted ? "destructive" : "default"}>{c.status}</Badge></Field>
             <Field label="Service" value={serviceLabel(c.service_type)} />
             <Field label="Package" value={c.package_name ?? "—"} />
-            <Field label="Speed" value={c.internet_speed ?? "—"} />
             <Field label="Monthly bill"><Money value={c.monthly_bill} /></Field>
             <Field label="Billing day" value={`${c.billing_day} of month`} />
             <Field label="Opening balance"><Money value={c.opening_balance} /></Field>
