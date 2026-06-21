@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, KeyRound, ShieldOff, Shield } from "lucide-react";
+import { Plus, KeyRound, ShieldOff, Shield, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { adminCreateUser, adminResetUserPassword } from "@/lib/admin.functions";
+import { adminCreateUser, adminResetUserPassword, adminUpdateUser, adminDeleteUser } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/app/admin/staff")({
   component: StaffPage,
@@ -81,8 +81,14 @@ function StaffPage() {
 
 function StaffActions({ row, onChange }: { row: StaffRow; onChange: () => void }) {
   const reset = useServerFn(adminResetUserPassword);
+  const update = useServerFn(adminUpdateUser);
+  const del = useServerFn(adminDeleteUser);
   const [pwOpen, setPwOpen] = useState(false);
   const [pw, setPw] = useState("");
+  const [editOpen, setEditOpen] = useState(false);
+  const [edit, setEdit] = useState({ fullName: row.full_name ?? "", phone: row.phone ?? "" });
+  const [delOpen, setDelOpen] = useState(false);
+  const [delReason, setDelReason] = useState("");
 
   const toggleRole = async (role: "admin" | "collector", has: boolean) => {
     const rpc = has ? "admin_revoke_role" : "admin_set_role";
@@ -103,24 +109,70 @@ function StaffActions({ row, onChange }: { row: StaffRow; onChange: () => void }
     } catch (e) { toast.error(String((e as Error).message)); }
   };
 
+  const submitEdit = async () => {
+    try {
+      await update({ data: { userId: row.id, fullName: edit.fullName, phone: edit.phone || null } });
+      toast.success("Saved");
+      setEditOpen(false); onChange();
+    } catch (e) { toast.error(String((e as Error).message)); }
+  };
+
+  const submitDelete = async () => {
+    try {
+      await del({ data: { userId: row.id, reason: delReason || undefined } });
+      toast.success("Staff deleted");
+      setDelOpen(false); onChange();
+    } catch (e) { toast.error(String((e as Error).message)); }
+  };
+
   return (
-    <div className="flex justify-end gap-1">
-      <Button size="sm" variant="ghost" onClick={() => toggleRole("collector", isCollector)}>
+    <div className="flex flex-wrap justify-end gap-1">
+      <Button size="sm" variant="ghost" onClick={() => toggleRole("collector", isCollector)} title="Toggle collector">
         {isCollector ? <ShieldOff className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
-        <span className="ml-1 text-xs">collector</span>
+        <span className="ml-1 text-xs hidden sm:inline">collector</span>
       </Button>
-      <Button size="sm" variant="ghost" onClick={() => toggleRole("admin", isAdmin)}>
+      <Button size="sm" variant="ghost" onClick={() => toggleRole("admin", isAdmin)} title="Toggle admin">
         {isAdmin ? <ShieldOff className="h-4 w-4" /> : <Shield className="h-4 w-4" />}
-        <span className="ml-1 text-xs">admin</span>
+        <span className="ml-1 text-xs hidden sm:inline">admin</span>
       </Button>
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogTrigger asChild><Button size="sm" variant="ghost" title="Edit"><Pencil className="h-4 w-4" /></Button></DialogTrigger>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Edit {row.full_name}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1.5"><Label>Full name</Label>
+              <Input value={edit.fullName} onChange={(e) => setEdit({ ...edit, fullName: e.target.value })} /></div>
+            <div className="space-y-1.5"><Label>Phone</Label>
+              <Input value={edit.phone} onChange={(e) => setEdit({ ...edit, phone: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button onClick={submitEdit}>Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={pwOpen} onOpenChange={setPwOpen}>
-        <DialogTrigger asChild><Button size="sm" variant="ghost"><KeyRound className="h-4 w-4" /></Button></DialogTrigger>
+        <DialogTrigger asChild><Button size="sm" variant="ghost" title="Reset password"><KeyRound className="h-4 w-4" /></Button></DialogTrigger>
         <DialogContent>
           <DialogHeader><DialogTitle>Reset password for {row.full_name}</DialogTitle></DialogHeader>
           <Input type="password" placeholder="New password (min 8)" value={pw} onChange={(e) => setPw(e.target.value)} />
           <DialogFooter>
             <Button variant="ghost" onClick={() => setPwOpen(false)}>Cancel</Button>
             <Button onClick={submitPw}>Reset</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+        <DialogTrigger asChild><Button size="sm" variant="ghost" className="text-destructive" title="Delete"><Trash2 className="h-4 w-4" /></Button></DialogTrigger>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Delete {row.full_name}?</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This permanently removes the account and revokes their access. Historical receipts and audit log remain.
+          </p>
+          <Input value={delReason} onChange={(e) => setDelReason(e.target.value)} placeholder="Reason (optional)" />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDelOpen(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={submitDelete}>Delete</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

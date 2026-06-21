@@ -118,7 +118,7 @@ export function CustomerDialog({
     id: string; full_name: string; phone: string | null; address: string | null; area: string | null;
     monthly_bill: number; billing_day: number; status: "active" | "inactive";
     opening_balance: number; notes: string | null;
-    service_type?: string | null; package_name?: string | null; internet_speed?: string | null;
+    service_type?: string | null; package_name?: string | null;
   };
   onSaved?: () => void;
 }) {
@@ -130,7 +130,6 @@ export function CustomerDialog({
     area: existing?.area ?? "",
     service_type: existing?.service_type ?? "internet",
     package_name: existing?.package_name ?? "",
-    internet_speed: existing?.internet_speed ?? "",
     monthly_bill: existing?.monthly_bill ?? 1500,
     billing_day: existing?.billing_day ?? 1,
     status: (existing?.status ?? "active") as "active" | "inactive",
@@ -155,7 +154,6 @@ export function CustomerDialog({
       _notes: form.notes || null,
       _service_type: form.service_type || null,
       _package_name: form.package_name || null,
-      _internet_speed: form.internet_speed || null,
     } as never);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -189,8 +187,6 @@ export function CustomerDialog({
             </Select></div>
           <div className="space-y-1.5"><Label>Package name</Label>
             <Input value={form.package_name} onChange={(e) => setForm({ ...form, package_name: e.target.value })} placeholder="e.g. Home Pro" /></div>
-          <div className="space-y-1.5"><Label>Internet speed</Label>
-            <Input value={form.internet_speed} onChange={(e) => setForm({ ...form, internet_speed: e.target.value })} placeholder="e.g. 20 Mbps" /></div>
           <div className="space-y-1.5"><Label>Monthly bill (Rs.)</Label>
             <Input type="number" min={0} value={form.monthly_bill} onChange={(e) => setForm({ ...form, monthly_bill: Number(e.target.value) })} /></div>
           <div className="space-y-1.5"><Label>Billing day (1-28)</Label>

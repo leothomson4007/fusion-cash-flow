@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Money } from "@/components/money";
 import { formatMoney, formatDateTime } from "@/lib/format";
-import { Wifi, CheckCircle2, Ban, Download, Share2, Printer } from "lucide-react";
+import { Wifi, CheckCircle2, Ban, ImageDown, Share2, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -88,23 +88,24 @@ export function ReceiptCard({
     setTimeout(() => { w.print(); }, 350);
   };
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadImage = async () => {
     setBusy(true);
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
+      const { default: html2canvas } = await import("html2canvas");
       const node = printRef.current;
       if (!node) return;
       const canvas = await html2canvas(node, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-      const img = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ unit: "pt", format: [canvas.width * 0.5, canvas.height * 0.5] });
-      pdf.addImage(img, "PNG", 0, 0, canvas.width * 0.5, canvas.height * 0.5);
-      pdf.save(`${receipt.receipt_no}.pdf`);
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `${receipt.receipt_no}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Receipt image saved");
     } catch (e) {
       console.error(e);
-      toast.error("Couldn't generate PDF — try Print instead");
+      toast.error("Couldn't save image — try Print instead");
     } finally {
       setBusy(false);
     }
@@ -193,8 +194,8 @@ export function ReceiptCard({
 
       {showActions && (
         <div className="grid grid-cols-3 gap-2 no-print">
-          <Button variant="outline" onClick={handleDownloadPdf} disabled={busy}>
-            <Download className="h-4 w-4 mr-1" />{busy ? "…" : "PDF"}
+          <Button variant="outline" onClick={handleDownloadImage} disabled={busy}>
+            <ImageDown className="h-4 w-4 mr-1" />{busy ? "…" : "Save image"}
           </Button>
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-1" />Print

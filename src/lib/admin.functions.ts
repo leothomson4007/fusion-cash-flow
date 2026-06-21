@@ -54,3 +54,49 @@ export const adminResetUserPassword = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+export const adminUpdateUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; fullName?: string; phone?: string | null; email?: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (data.email) {
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { email: data.email });
+      if (error) throw new Error(error.message);
+    }
+    const profileUpdate: { full_name?: string; phone?: string | null } = {};
+    if (data.fullName !== undefined) profileUpdate.full_name = data.fullName;
+    if (data.phone !== undefined) profileUpdate.phone = data.phone;
+    if (Object.keys(profileUpdate).length) {
+      const { error } = await supabaseAdmin.from("profiles").update(profileUpdate).eq("id", data.userId);
+      if (error) throw new Error(error.message);
+    }
+    await supabaseAdmin.from("audit_log").insert({
+      actor_id: context.userId, action: "update_user", entity: "user", entity_id: data.userId,
+      new_data: { ...profileUpdate, email: data.email ?? null },
+    });
+    return { ok: true };
+  });
+
+export const adminDeleteUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; reason?: string }) => d)
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden");
+    if (data.userId === context.userId) throw new Error("You cannot delete your own account");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Audit BEFORE deletion (FK to auth.users cascades and removes roles/profile)
+    await supabaseAdmin.from("audit_log").insert({
+      actor_id: context.userId, action: "delete_user", entity: "user", entity_id: data.userId,
+      reason: data.reason ?? null,
+    });
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
