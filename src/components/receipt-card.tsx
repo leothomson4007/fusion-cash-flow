@@ -194,8 +194,8 @@ export function ReceiptCard({
 
       {showActions && (
         <div className="grid grid-cols-3 gap-2 no-print">
-          <Button variant="outline" onClick={handleDownloadPdf} disabled={busy}>
-            <Download className="h-4 w-4 mr-1" />{busy ? "…" : "PDF"}
+          <Button variant="outline" onClick={handleDownloadImage} disabled={busy}>
+            <ImageDown className="h-4 w-4 mr-1" />{busy ? "…" : "Save image"}
           </Button>
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-1" />Print
