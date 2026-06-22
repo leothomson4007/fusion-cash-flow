@@ -278,12 +278,7 @@ function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
 
       {editData && (
         <CustomerDialog
-          existing={{
-            ...editData,
-            monthly_bill: Number(editData.monthly_bill),
-            opening_balance: Number(editData.opening_balance),
-            status: (editData.status === "deleted" ? "inactive" : editData.status) as "active" | "inactive",
-          }}
+          existing={editData}
           forceOpen
           onClose={() => setEditData(null)}
           onSaved={() => { setEditData(null); onChanged(); }}
