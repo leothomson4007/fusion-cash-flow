@@ -301,8 +301,6 @@ function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
         </DialogContent>
       </Dialog>
 
-      {/* Hidden navigate helper to silence unused warning */}
-      <span hidden onClick={() => navigate({ to: "/app/admin/customers/$id", params: { id: c.customer_id } })} />
     </div>
   );
 }
