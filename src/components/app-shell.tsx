@@ -106,19 +106,75 @@ function MobileBottomNav({ role }: { role: AppRole }) {
   const items = role === "admin" ? ADMIN_NAV.slice(0, 4) : COLLECTOR_NAV;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-card md:hidden">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.06)] md:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
       {items.map((item) => {
         const active = pathname === item.to || pathname.startsWith(item.to + "/");
         return (
-          <Link key={item.to} to={item.to}
-            className={cn("flex flex-col items-center gap-1 py-2 text-[10px] font-medium",
-              active ? "text-primary" : "text-muted-foreground")}>
+          <Link
+            key={item.to}
+            to={item.to}
+            className={cn(
+              "flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium active:bg-muted",
+              active ? "text-primary" : "text-muted-foreground",
+            )}
+          >
             <item.icon className="h-5 w-5" />
-            <span>{item.title}</span>
+            <span className="leading-none">{item.title}</span>
           </Link>
         );
       })}
     </nav>
+  );
+}
+
+function MobileMoreMenu({ role }: { role: AppRole }) {
+  const items = role === "admin" ? ADMIN_NAV.slice(4) : [];
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const logout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+  if (role !== "admin") {
+    return (
+      <Button variant="ghost" size="icon" onClick={logout} className="md:hidden" aria-label="Sign out">
+        <LogOut className="h-5 w-5" />
+      </Button>
+    );
+  }
+  return (
+    <div className="md:hidden relative">
+      <Button variant="ghost" size="icon" onClick={() => setOpen((v) => !v)} aria-label="More">
+        <Menu className="h-5 w-5" />
+      </Button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 z-50 w-48 rounded-md border bg-popover shadow-md py-1">
+            {items.map((it) => (
+              <Link
+                key={it.to}
+                to={it.to}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
+              >
+                <it.icon className="h-4 w-4" />
+                {it.title}
+              </Link>
+            ))}
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-destructive border-t mt-1"
+            >
+              <LogOut className="h-4 w-4" /> Sign out
+            </button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -142,12 +198,14 @@ export function AppShell({
           <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-card/95 px-4 backdrop-blur">
             <div className="flex items-center gap-2 min-w-0">
               <div className="hidden md:block"><SidebarTrigger /></div>
-              <div className="md:hidden"><Menu className="h-5 w-5 text-primary" /></div>
               <h1 className="truncate text-base font-semibold tracking-tight">{title}</h1>
             </div>
-            <div className="flex items-center gap-2">{action}</div>
+            <div className="flex items-center gap-2">
+              {action}
+              <MobileMoreMenu role={role} />
+            </div>
           </header>
-          <main className="flex-1 px-4 py-5 pb-24 md:px-6 md:pb-8">{children}</main>
+          <main className="flex-1 px-4 py-5 pb-28 md:px-6 md:pb-8">{children}</main>
           <MobileBottomNav role={role} />
         </div>
       </div>
