@@ -252,7 +252,13 @@ function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
   const openEdit = async () => {
     const { data: full } = await supabase.from("customers").select("*").eq("id", c.customer_id).single();
     if (!full) return toast.error("Could not load customer");
-    setEditData(full);
+    setEditData({
+      id: full.id, full_name: full.full_name, phone: full.phone, address: full.address, area: full.area,
+      monthly_bill: Number(full.monthly_bill), billing_day: full.billing_day,
+      status: (full.status === "deleted" ? "inactive" : full.status) as "active" | "inactive",
+      opening_balance: Number(full.opening_balance), notes: full.notes,
+      service_type: full.service_type, package_name: full.package_name,
+    });
   };
   const [editData, setEditData] = useState<{
     id: string; full_name: string; phone: string | null; address: string | null; area: string | null;
