@@ -237,7 +237,7 @@ function CustomerCard({ c, onChanged }: { c: Row; onChanged: () => void }) {
 function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
   const [delOpen, setDelOpen] = useState(false);
   const [reason, setReason] = useState("");
-  const navigate = useNavigate();
+
 
   const doDelete = async () => {
     if (!reason.trim()) return toast.error("Reason required");
