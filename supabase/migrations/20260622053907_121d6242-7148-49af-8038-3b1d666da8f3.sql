@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.admin_upsert_customer(uuid, text, text, text, text, numeric, integer, public.customer_status, numeric, text);

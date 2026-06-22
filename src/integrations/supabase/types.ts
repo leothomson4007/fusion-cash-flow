@@ -517,88 +517,48 @@ export type Database = {
               isSetofReturn: false
             }
           }
-      admin_upsert_customer:
-        | {
-            Args: {
-              _address: string
-              _area: string
-              _billing_day: number
-              _full_name: string
-              _id: string
-              _monthly_bill: number
-              _notes: string
-              _opening_balance: number
-              _phone: string
-              _status: Database["public"]["Enums"]["customer_status"]
-            }
-            Returns: {
-              address: string | null
-              area: string | null
-              billing_day: number
-              created_at: string
-              created_by: string | null
-              customer_no: string
-              deleted_at: string | null
-              full_name: string
-              id: string
-              monthly_bill: number
-              notes: string | null
-              opening_balance: number
-              package_name: string | null
-              phone: string | null
-              service_type: string | null
-              status: Database["public"]["Enums"]["customer_status"]
-              updated_at: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "customers"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              _address: string
-              _area: string
-              _billing_day: number
-              _full_name: string
-              _id: string
-              _internet_speed?: string
-              _monthly_bill: number
-              _notes: string
-              _opening_balance: number
-              _package_name?: string
-              _phone: string
-              _service_type?: string
-              _status: Database["public"]["Enums"]["customer_status"]
-            }
-            Returns: {
-              address: string | null
-              area: string | null
-              billing_day: number
-              created_at: string
-              created_by: string | null
-              customer_no: string
-              deleted_at: string | null
-              full_name: string
-              id: string
-              monthly_bill: number
-              notes: string | null
-              opening_balance: number
-              package_name: string | null
-              phone: string | null
-              service_type: string | null
-              status: Database["public"]["Enums"]["customer_status"]
-              updated_at: string
-            }
-            SetofOptions: {
-              from: "*"
-              to: "customers"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      admin_upsert_customer: {
+        Args: {
+          _address: string
+          _area: string
+          _billing_day: number
+          _full_name: string
+          _id: string
+          _internet_speed?: string
+          _monthly_bill: number
+          _notes: string
+          _opening_balance: number
+          _package_name?: string
+          _phone: string
+          _service_type?: string
+          _status: Database["public"]["Enums"]["customer_status"]
+        }
+        Returns: {
+          address: string | null
+          area: string | null
+          billing_day: number
+          created_at: string
+          created_by: string | null
+          customer_no: string
+          deleted_at: string | null
+          full_name: string
+          id: string
+          monthly_bill: number
+          notes: string | null
+          opening_balance: number
+          package_name: string | null
+          phone: string | null
+          service_type: string | null
+          status: Database["public"]["Enums"]["customer_status"]
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "customers"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       claim_first_admin: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
