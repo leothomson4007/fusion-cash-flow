@@ -58,10 +58,9 @@ function CustomersPage() {
 
   const filtered = useMemo(() => {
     return (data ?? []).filter((c) => {
-      if (q.trim()) {
-        const needle = q.toLowerCase();
+      if (debouncedQ) {
         const hay = `${c.full_name} ${c.customer_no} ${c.phone ?? ""} ${c.area ?? ""}`.toLowerCase();
-        if (!hay.includes(needle)) return false;
+        if (!hay.includes(debouncedQ)) return false;
       }
       if (areaFilter !== "all" && c.area !== areaFilter) return false;
       if (serviceFilter !== "all" && c.service_type !== serviceFilter) return false;
@@ -69,7 +68,14 @@ function CustomersPage() {
       if (paidFilter === "paid" && Number(c.balance) > 0) return false;
       return true;
     });
-  }, [data, q, areaFilter, serviceFilter, paidFilter]);
+  }, [data, debouncedQ, areaFilter, serviceFilter, paidFilter]);
+
+  // Reset to first page when filters or search change
+  useEffect(() => { setPage(1); }, [debouncedQ, statusFilter, areaFilter, serviceFilter, paidFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) +
