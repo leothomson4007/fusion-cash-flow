@@ -270,15 +270,30 @@ function CustomerCard({ c, onChanged }: { c: Row; onChanged: () => void }) {
 function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
   const [delOpen, setDelOpen] = useState(false);
   const [reason, setReason] = useState("");
-
+  const [deleting, setDeleting] = useState(false);
 
   const doDelete = async () => {
-    if (!reason.trim()) return toast.error("Reason required");
+    if (!reason.trim()) return toast.error("Please enter a reason — this is logged in the audit trail");
+    setDeleting(true);
     const { error } = await supabase.rpc("admin_delete_customer", { _id: c.customer_id, _reason: reason } as never);
+    setDeleting(false);
     if (error) return toast.error(error.message);
-    toast.success("Customer deleted");
+    const savedReason = reason;
     setDelOpen(false); setReason("");
     onChanged();
+    toast.success(`${c.full_name} deleted`, {
+      description: `Reason logged: "${savedReason}"`,
+      duration: 8000,
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          const { error: e } = await supabase.rpc("admin_restore_customer", { _id: c.customer_id } as never);
+          if (e) return toast.error(e.message);
+          toast.success(`${c.full_name} restored`);
+          onChanged();
+        },
+      },
+    });
   };
 
   // We need to fetch the full customer to edit
@@ -320,16 +335,26 @@ function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
         </CustomerDialog>
       )}
 
-      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+      <Dialog open={delOpen} onOpenChange={(v) => { if (!deleting) setDelOpen(v); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Delete {c.full_name}?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            The customer will be hidden from active lists. Their receipts and audit log remain intact and can be restored later.
-          </p>
-          <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason for deletion" />
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Trash2 className="h-5 w-5 text-destructive" />Delete {c.full_name}?</DialogTitle></DialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              The customer will be hidden from active lists. Their receipts and audit log remain intact and can be restored later. You can also use <strong>Undo</strong> in the toast immediately after.
+            </p>
+            {Number(c.balance) > 0 && (
+              <p className="text-sm rounded-md bg-destructive/10 text-destructive p-2">
+                ⚠ This customer has an outstanding balance of <Money value={c.balance} />. Make sure this is intentional.
+              </p>
+            )}
+            <Label className="text-xs">Reason (required, logged in audit)</Label>
+            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Duplicate entry, moved out, etc." autoFocus />
+          </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDelOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={doDelete}>Delete</Button>
+            <Button variant="ghost" onClick={() => setDelOpen(false)} disabled={deleting}>Cancel</Button>
+            <Button variant="destructive" onClick={doDelete} disabled={deleting || !reason.trim()}>
+              {deleting ? "Deleting…" : "Delete customer"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
