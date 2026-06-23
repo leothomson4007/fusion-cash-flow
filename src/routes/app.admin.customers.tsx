@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Money } from "@/components/money";
-import { Plus, Search, Pencil, Trash2, MapPin, Wifi, Tv, Filter, X } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, MapPin, Wifi, Tv, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/admin/customers")({
