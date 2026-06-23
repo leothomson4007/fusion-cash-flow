@@ -223,8 +223,8 @@ function ReportsPage() {
             <CardTitle className="text-base">Customers</CardTitle>
             <CardDescription>{filteredCustomers.length} matching filters</CardDescription>
           </div>
-          <Button size="icon" variant="outline" onClick={downloadCustomers} aria-label="Download customers CSV" title="Download CSV">
-            <Download className="h-4 w-4" />
+          <Button size="icon" variant="outline" onClick={downloadCustomers} disabled={exporting === "customers"} aria-label="Download customers CSV" title="Download CSV">
+            {exporting === "customers" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           </Button>
         </CardHeader>
         <CardContent className="p-0 max-h-72 overflow-auto">
