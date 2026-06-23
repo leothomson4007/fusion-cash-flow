@@ -129,23 +129,41 @@ function ReportsPage() {
     },
   });
 
-  const downloadCustomers = () => {
-    downloadCSV(`customers-${todayStr()}.csv`, filteredCustomers.map((c) => ({
-      customer_no: c.customer_no, name: c.full_name, phone: c.phone, area: c.area,
-      service: c.service_type, package: c.package_name,
-      monthly_bill: c.monthly_bill, balance: c.balance, status: c.status,
-    })));
+  const [exporting, setExporting] = useState<"customers" | "receipts" | null>(null);
+
+  const downloadCustomers = async () => {
+    if (filteredCustomers.length === 0) return toast.info("No customers to export with current filters");
+    setExporting("customers");
+    try {
+      await new Promise((r) => setTimeout(r, 50)); // yield so spinner paints
+      const rows = filteredCustomers.map((c) => ({
+        customer_no: c.customer_no, name: c.full_name, phone: c.phone, area: c.area,
+        service: c.service_type, package: c.package_name,
+        monthly_bill: c.monthly_bill, balance: c.balance, status: c.status,
+      }));
+      const name = `customers-${todayStr()}.csv`;
+      downloadCSV(name, rows);
+      toast.success(`Exported ${rows.length} customers`, { description: name });
+    } finally { setExporting(null); }
   };
 
-  const downloadReceipts = () => {
-    downloadCSV(`receipts-${fromDate}-to-${toDate}.csv`, filteredReceipts.map((r) => {
-      const cust = r.customer as { customer_no?: string; full_name?: string; area?: string } | null;
-      return {
-        receipt_no: r.receipt_no, date: r.created_at, customer_no: cust?.customer_no,
-        customer: cust?.full_name, area: cust?.area, amount: r.amount,
-        payment_type: r.payment_type, status: r.status,
-      };
-    }));
+  const downloadReceipts = async () => {
+    if (filteredReceipts.length === 0) return toast.info("No receipts to export in this range");
+    setExporting("receipts");
+    try {
+      await new Promise((r) => setTimeout(r, 50));
+      const rows = filteredReceipts.map((r) => {
+        const cust = r.customer as { customer_no?: string; full_name?: string; area?: string } | null;
+        return {
+          receipt_no: r.receipt_no, date: r.created_at, customer_no: cust?.customer_no,
+          customer: cust?.full_name, area: cust?.area, amount: r.amount,
+          payment_type: r.payment_type, status: r.status,
+        };
+      });
+      const name = `receipts-${fromDate}-to-${toDate}.csv`;
+      downloadCSV(name, rows);
+      toast.success(`Exported ${rows.length} receipts`, { description: name });
+    } finally { setExporting(null); }
   };
 
   return (
