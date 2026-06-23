@@ -105,25 +105,30 @@ function AppSidebar({ role, fullName }: { role: AppRole; fullName?: string | nul
 function MobileBottomNav({ role }: { role: AppRole }) {
   const items = role === "admin" ? ADMIN_NAV.slice(0, 4) : COLLECTOR_NAV;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const cols = items.length === 3 ? "grid-cols-3" : items.length === 5 ? "grid-cols-5" : "grid-cols-4";
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4 border-t bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.06)] md:hidden"
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-50 grid border-t bg-card shadow-[0_-4px_12px_rgba(0,0,0,0.06)] md:hidden pointer-events-auto",
+        cols,
+      )}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {items.map((item) => {
         const active = pathname === item.to || pathname.startsWith(item.to + "/");
         return (
-          <Link
-            key={item.to}
-            to={item.to}
-            className={cn(
-              "flex min-h-[56px] flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium active:bg-muted",
-              active ? "text-primary" : "text-muted-foreground",
-            )}
-          >
-            <item.icon className="h-5 w-5" />
-            <span className="leading-none">{item.title}</span>
-          </Link>
+            <Link
+              key={item.to}
+              to={item.to}
+              preload="intent"
+              className={cn(
+                "flex min-h-[60px] flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium select-none touch-manipulation active:bg-muted",
+                active ? "text-primary" : "text-muted-foreground",
+              )}
+            >
+              <item.icon className="h-5 w-5 pointer-events-none" />
+              <span className="leading-none pointer-events-none">{item.title}</span>
+            </Link>
         );
       })}
     </nav>

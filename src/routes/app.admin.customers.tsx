@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Money } from "@/components/money";
-import { Plus, Search, Pencil, Trash2, MapPin, Wifi, Tv, Filter, X } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, MapPin, Wifi, Tv, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/admin/customers")({
@@ -25,11 +25,20 @@ type Row = {
 
 function CustomersPage() {
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [areaFilter, setAreaFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
   const [paidFilter, setPaidFilter] = useState<"all" | "unpaid" | "paid">("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 25;
   const qc = useQueryClient();
+
+  // Debounce search for snappier filtering on mobile
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim().toLowerCase()), 200);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["customer-balances", statusFilter],
@@ -49,10 +58,9 @@ function CustomersPage() {
 
   const filtered = useMemo(() => {
     return (data ?? []).filter((c) => {
-      if (q.trim()) {
-        const needle = q.toLowerCase();
+      if (debouncedQ) {
         const hay = `${c.full_name} ${c.customer_no} ${c.phone ?? ""} ${c.area ?? ""}`.toLowerCase();
-        if (!hay.includes(needle)) return false;
+        if (!hay.includes(debouncedQ)) return false;
       }
       if (areaFilter !== "all" && c.area !== areaFilter) return false;
       if (serviceFilter !== "all" && c.service_type !== serviceFilter) return false;
@@ -60,7 +68,14 @@ function CustomersPage() {
       if (paidFilter === "paid" && Number(c.balance) > 0) return false;
       return true;
     });
-  }, [data, q, areaFilter, serviceFilter, paidFilter]);
+  }, [data, debouncedQ, areaFilter, serviceFilter, paidFilter]);
+
+  // Reset to first page when filters or search change
+  useEffect(() => { setPage(1); }, [debouncedQ, statusFilter, areaFilter, serviceFilter, paidFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paged = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   const activeFilterCount =
     (statusFilter !== "all" ? 1 : 0) +
@@ -142,7 +157,7 @@ function CustomersPage() {
               {!isLoading && filtered.length === 0 && (
                 <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No customers match.</td></tr>
               )}
-              {filtered.map((c) => (
+              {paged.map((c) => (
                 <CustomerRow key={c.customer_id} c={c} onChanged={() => qc.invalidateQueries({ queryKey: ["customer-balances"] })} />
               ))}
             </tbody>
@@ -154,10 +169,28 @@ function CustomersPage() {
       <div className="md:hidden space-y-2">
         {isLoading && <div className="p-6 text-center text-sm text-muted-foreground">Loading…</div>}
         {!isLoading && filtered.length === 0 && <div className="p-6 text-center text-sm text-muted-foreground">No customers match.</div>}
-        {filtered.map((c) => (
+        {paged.map((c) => (
           <CustomerCard key={c.customer_id} c={c} onChanged={() => qc.invalidateQueries({ queryKey: ["customer-balances"] })} />
         ))}
       </div>
+
+      {/* Pagination */}
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <div className="text-xs text-muted-foreground">
+            Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)} aria-label="Previous page">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-xs tabular-nums px-2">{safePage} / {totalPages}</span>
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)} aria-label="Next page">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -237,15 +270,30 @@ function CustomerCard({ c, onChanged }: { c: Row; onChanged: () => void }) {
 function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
   const [delOpen, setDelOpen] = useState(false);
   const [reason, setReason] = useState("");
-
+  const [deleting, setDeleting] = useState(false);
 
   const doDelete = async () => {
-    if (!reason.trim()) return toast.error("Reason required");
+    if (!reason.trim()) return toast.error("Please enter a reason — this is logged in the audit trail");
+    setDeleting(true);
     const { error } = await supabase.rpc("admin_delete_customer", { _id: c.customer_id, _reason: reason } as never);
+    setDeleting(false);
     if (error) return toast.error(error.message);
-    toast.success("Customer deleted");
+    const savedReason = reason;
     setDelOpen(false); setReason("");
     onChanged();
+    toast.success(`${c.full_name} deleted`, {
+      description: `Reason logged: "${savedReason}"`,
+      duration: 8000,
+      action: {
+        label: "Undo",
+        onClick: async () => {
+          const { error: e } = await supabase.rpc("admin_restore_customer", { _id: c.customer_id } as never);
+          if (e) return toast.error(e.message);
+          toast.success(`${c.full_name} restored`);
+          onChanged();
+        },
+      },
+    });
   };
 
   // We need to fetch the full customer to edit
@@ -287,16 +335,26 @@ function RowActions({ c, onChanged }: { c: Row; onChanged: () => void }) {
         </CustomerDialog>
       )}
 
-      <Dialog open={delOpen} onOpenChange={setDelOpen}>
+      <Dialog open={delOpen} onOpenChange={(v) => { if (!deleting) setDelOpen(v); }}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Delete {c.full_name}?</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            The customer will be hidden from active lists. Their receipts and audit log remain intact and can be restored later.
-          </p>
-          <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason for deletion" />
+          <DialogHeader><DialogTitle className="flex items-center gap-2"><Trash2 className="h-5 w-5 text-destructive" />Delete {c.full_name}?</DialogTitle></DialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              The customer will be hidden from active lists. Their receipts and audit log remain intact and can be restored later. You can also use <strong>Undo</strong> in the toast immediately after.
+            </p>
+            {Number(c.balance) > 0 && (
+              <p className="text-sm rounded-md bg-destructive/10 text-destructive p-2">
+                ⚠ This customer has an outstanding balance of <Money value={c.balance} />. Make sure this is intentional.
+              </p>
+            )}
+            <Label className="text-xs">Reason (required, logged in audit)</Label>
+            <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Duplicate entry, moved out, etc." autoFocus />
+          </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setDelOpen(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={doDelete}>Delete</Button>
+            <Button variant="ghost" onClick={() => setDelOpen(false)} disabled={deleting}>Cancel</Button>
+            <Button variant="destructive" onClick={doDelete} disabled={deleting || !reason.trim()}>
+              {deleting ? "Deleting…" : "Delete customer"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
