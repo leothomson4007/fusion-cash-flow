@@ -248,8 +248,8 @@ function ReportsPage() {
             <CardTitle className="text-base">Receipts</CardTitle>
             <CardDescription><Money value={totalCollected} /> across {filteredReceipts.length} receipts</CardDescription>
           </div>
-          <Button size="icon" variant="outline" onClick={downloadReceipts} aria-label="Download receipts CSV" title="Download CSV">
-            <Download className="h-4 w-4" />
+          <Button size="icon" variant="outline" onClick={downloadReceipts} disabled={exporting === "receipts"} aria-label="Download receipts CSV" title="Download CSV">
+            {exporting === "receipts" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
           </Button>
         </CardHeader>
         <CardContent className="p-0 max-h-72 overflow-auto">
