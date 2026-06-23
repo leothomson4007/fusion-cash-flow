@@ -157,7 +157,7 @@ function CustomersPage() {
               {!isLoading && filtered.length === 0 && (
                 <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No customers match.</td></tr>
               )}
-              {filtered.map((c) => (
+              {paged.map((c) => (
                 <CustomerRow key={c.customer_id} c={c} onChanged={() => qc.invalidateQueries({ queryKey: ["customer-balances"] })} />
               ))}
             </tbody>
@@ -169,10 +169,28 @@ function CustomersPage() {
       <div className="md:hidden space-y-2">
         {isLoading && <div className="p-6 text-center text-sm text-muted-foreground">Loading…</div>}
         {!isLoading && filtered.length === 0 && <div className="p-6 text-center text-sm text-muted-foreground">No customers match.</div>}
-        {filtered.map((c) => (
+        {paged.map((c) => (
           <CustomerCard key={c.customer_id} c={c} onChanged={() => qc.invalidateQueries({ queryKey: ["customer-balances"] })} />
         ))}
       </div>
+
+      {/* Pagination */}
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-2 pt-1">
+          <div className="text-xs text-muted-foreground">
+            Showing {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage <= 1} onClick={() => setPage((p) => p - 1)} aria-label="Previous page">
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-xs tabular-nums px-2">{safePage} / {totalPages}</span>
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={safePage >= totalPages} onClick={() => setPage((p) => p + 1)} aria-label="Next page">
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
