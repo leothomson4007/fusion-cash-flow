@@ -35,8 +35,7 @@ function CustomersPage() {
   const qc = useQueryClient();
 
   // Debounce search for snappier filtering on mobile
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useMemo(() => {
+  useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(q.trim().toLowerCase()), 200);
     return () => clearTimeout(t);
   }, [q]);
