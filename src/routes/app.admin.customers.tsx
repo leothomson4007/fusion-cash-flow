@@ -25,11 +25,21 @@ type Row = {
 
 function CustomersPage() {
   const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [areaFilter, setAreaFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
   const [paidFilter, setPaidFilter] = useState<"all" | "unpaid" | "paid">("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 25;
   const qc = useQueryClient();
+
+  // Debounce search for snappier filtering on mobile
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useMemo(() => {
+    const t = setTimeout(() => setDebouncedQ(q.trim().toLowerCase()), 200);
+    return () => clearTimeout(t);
+  }, [q]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["customer-balances", statusFilter],
