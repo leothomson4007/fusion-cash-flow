@@ -1,89 +1,60 @@
+## Remaining issues (from the security scan)
 
-# Fusion Net — ISP Billing & Cash Collection
+Six findings are still open. The previous turn discussed them but no migration was actually applied — the latest migration is still `20260622053907_…`. Here's what's wrong and how I'll fix each.
 
-A mobile-first internal app for a small ISP (≤600 customers). Two roles (Admin, Collector), strict sequential receipts, partial payments with running balances, cash submission/verification, and an immutable audit log.
+### 1. `has_role_no_search_path_bypass` — ERROR (privilege escalation)
+`public.user_roles` has no write-restriction policy, so any signed-in user could `INSERT` themselves an `admin` row, and `has_role()` would then return true. This is the most serious finding.
 
-## Stack & foundation
-- TanStack Start + Tailwind v4, shadcn/ui, **Trust Blue** theme (primary `#1E6FD9`, deep `#0B3D91`, success `#16A34A`, surface `#F4F7FB`).
-- Lovable Cloud for DB + auth (email/password). Admin pre-seeded; admin creates collector accounts via Edge Function (service role).
-- Currency: PKR `Rs. 2,500` formatting helper.
-- Mobile-first layout: bottom-nav on phones, sidebar on desktop. Large tap targets.
+**Fix:** Add strict RLS on `user_roles`:
+- `SELECT`: only admins, or the row owner reading their own roles.
+- `INSERT / UPDATE / DELETE`: admins only (`WITH CHECK (has_role(auth.uid(),'admin'))`).
+- Keep `admin_set_role` / `admin_revoke_role` as the only sanctioned write path (they're SECURITY DEFINER and already gate on `has_role`).
 
-## Database (Cloud / Postgres + RLS)
-- `profiles` — id (auth.users), full_name, phone, active.
-- `user_roles` — (user_id, role enum: admin | collector). `has_role()` security-definer fn.
-- `customers` — customer_no (FN-Cxxxx, unique), name, phone, address, area, monthly_bill, billing_day (1–28), status, created_by, timestamps.
-- `receipts` — id, **receipt_no** (`FN-YYYY-000001`, unique, sequential), customer_id, amount, payment_type (`cash|bank|easypaisa|jazzcash`), status (`active|cancelled`), cancelled_reason, collector_id, created_by, created_at.
-  - Sequence generated via a Postgres function + `receipt_sequence` table per year, inside a `SECURITY DEFINER` RPC so collectors never set the number. Unique constraint + gap-detection view.
-- `cash_submissions` — collector_id, expected_amount (sum of their active cash receipts since last submission), declared_amount, received_amount (admin), status (`pending|verified`), difference, verified_by, timestamps.
-- `audit_log` — actor_id, action, entity, entity_id, old_data jsonb, new_data jsonb, created_at. Triggers on receipts, customers, cash_submissions. Insert-only RLS.
-- Running balance per customer = sum(active bills generated) − sum(active receipts). Monthly bill rows auto-created by a Postgres function `generate_monthly_bills()` invoked on demand from admin dashboard + on customer login of cycle date check.
+### 2. `customers_all_authenticated_read` — WARN (PII exposure)
+Current SELECT policy lets every signed-in user (including collectors) read every customer's phone, address, balance.
 
-### RLS summary
-- Admin: full select/insert/update where policies use `has_role(uid,'admin')`.
-- Collector: select own profile, select customers (read-only list), insert receipts (only as themselves, payment_type forced to `cash` via trigger), select own receipts + own cash submissions.
-- No deletes anywhere; cancel = update status with reason (admin-only, audit-logged).
+**Fix:** Replace the broad policy with two scoped ones:
+- Admins: full SELECT.
+- Collectors: SELECT only on `status = 'active'` rows, and project sensitive columns through a view (`customer_directory`) that omits `notes`, `opening_balance`, `address` — collectors need name / phone / area / monthly_bill / balance to collect cash, nothing more.
+- Update `src/routes/app.collector.*` and `src/components/customer-search.tsx` to read from `customer_directory` instead of `customers` / `customer_balances` where applicable. Admin screens keep reading `customers` / `customer_balances` unchanged.
 
-## Routes
-```
-/auth                       login
-/_authenticated/
-  index                     role-based redirect
-  admin/
-    dashboard               KPIs + today's collection + collector perf
-    customers               list + search + create/edit/deactivate
-    customers/$id           detail + payment history + balance
-    receipts                all receipts + filter, edit/cancel
-    receipts/new            admin-create receipt (any payment type)
-    cash                    submissions queue + verify
-    audit                   audit log viewer
-    reports                 daily cash, unpaid, missing receipts, monthly revenue, collector perf
-    staff                   create/manage collectors
-  collector/
-    dashboard               today's receipts, total, submit cash button
-    new-receipt             fast customer search → amount → confirm
-    history                 my receipts (read-only)
-    submit-cash             declare amount, see expected, submit
-```
+### 3. `receipts_all_authenticated_read` — WARN (financial exposure)
+Same shape: every signed-in user can read every receipt.
 
-## Receipt flow (anti-fraud)
-1. Collector taps **New Receipt** → searches customer → enters amount.
-2. Client calls server fn → server fn calls `create_receipt()` RPC (SECURITY DEFINER): locks sequence row, generates `FN-YYYY-NNNNNN`, inserts receipt, writes audit row. Returns full receipt.
-3. UI shows printable/share-ready receipt; immediately locked (no edits for collector).
-4. Admin edit/cancel goes through `admin_modify_receipt()` RPC requiring reason; writes audit diff.
-5. **Missing-receipt report**: query joins sequence range against existing numbers to flag any gap (should be impossible by design but reported for assurance).
+**Fix:** Replace the SELECT policy with:
+- Admins: full SELECT.
+- Collectors: SELECT only where `collector_id = auth.uid()` OR `created_by = auth.uid()`.
 
-## Cash reconciliation
-- Collector dashboard shows: today's receipt count, total cash, last submission status.
-- **Submit Cash** computes expected = sum of own active cash receipts since last verified submission, collector declares amount, creates `pending` submission.
-- Admin **Cash** page lists pending → enters received amount → system computes difference (Match / Shortage / Excess) → marks verified. Audit-logged.
+Collector history / dashboard already filter by `collector_id`, so no UI change is needed beyond verifying queries still return rows under the new policy.
 
-## Dashboards & reports
-- Admin KPIs: total/active customers, MRR (sum monthly_bill of active), today's collection, outstanding balance, collector leaderboard.
-- Collector KPI cards + recent receipts list.
-- Reports use server fns returning aggregated data; CSV export for each.
+### 4. `realtime_messages_no_rls` — ERROR
+`realtime.messages` has no RLS, so any signed-in user can subscribe to any topic and receive broadcasts for `customers` / `receipts` / `cash_submissions`.
 
-## Audit log
-- DB triggers on insert/update of receipts, customers, cash_submissions write to `audit_log` with `to_jsonb(OLD)` / `to_jsonb(NEW)` + `auth.uid()`. Admin-only read; nobody can update/delete.
+**Fix:** Enable RLS on `realtime.messages` and add a policy that only allows subscription when `has_role(auth.uid(),'admin')` — the only place we use realtime today is the admin dashboard via `useRealtimeInvalidate`. Collectors don't subscribe, so this is safe. If we later need collector realtime, we'll scope by topic name.
 
-## UI/design system
-- Tokens in `src/styles.css` (oklch): background `#F4F7FB`, primary `#1E6FD9`, primary-deep `#0B3D91`, success `#16A34A`, warning amber, destructive. Card shadows, rounded-xl, generous spacing.
-- Font: Inter (via @fontsource).
-- Components: KPI cards, data tables (TanStack-style), money display, receipt card (printable), status badges, mobile bottom nav, sticky FAB for "New Receipt" on collector.
+### 5 & 6. `SUPA_anon_security_definer_function_executable` and `SUPA_authenticated_security_definer_function_executable` — WARN
+Postgres' default `GRANT EXECUTE … TO public` exposes every SECURITY DEFINER function to both `anon` and `authenticated`, even ones meant to be called only by admins or only server-side.
 
-## Build order
-1. Enable Cloud + email auth, theme + layout shell + auth page + role-routing + sidebar/bottom-nav.
-2. Migrations: profiles, user_roles, has_role, customers, receipts + sequence RPC, cash_submissions, audit_log + triggers, RLS, GRANTs.
-3. Admin: staff mgmt (edge fn for creating collector users), customers CRUD, customer detail + balance.
-4. Collector: new-receipt flow, history, submit-cash.
-5. Admin: receipts list + edit/cancel, cash verification, audit viewer.
-6. Dashboards + reports (CSV export, missing receipt detector).
-7. Polish, mobile pass, seed first admin instructions.
+**Fix:** For every function in `public`:
+1. `REVOKE EXECUTE … FROM PUBLIC, anon, authenticated;`
+2. Re-grant narrowly:
+   - `claim_first_admin`, `current_user_role`, `submit_cash`, `create_receipt`, `admin_exists`, `has_role`, `list_staff` → `GRANT EXECUTE … TO authenticated` (these are legitimately user-callable; SECURITY DEFINER bodies already enforce role checks).
+   - `admin_*` (`admin_set_role`, `admin_revoke_role`, `admin_upsert_customer`, `admin_delete_customer`, `admin_restore_customer`, `admin_update_receipt`, `admin_cancel_receipt`, `verify_cash`) → `GRANT EXECUTE … TO authenticated` (their bodies all check `has_role(auth.uid(),'admin')`; revoking from public + keeping authenticated is what the linter expects, since the role check is in the body).
+   - `handle_new_user`, `touch_updated_at`, `write_audit`, `next_customer_no`, `customer_bills_accrued`, `collector_expected_cash` → no grant to `anon`/`authenticated` (only triggers / other definer functions call them).
 
-## Notes / constraints
-- First admin: after signup the user runs a one-time "Claim admin" action only allowed when no admin exists yet; afterwards locked.
-- Collectors are created by admin via edge function using service role (no public signup).
-- All money stored as integer paisa? → keep as numeric(12,2) PKR for simplicity; format with `Rs.` helper.
-- Strict: no physical deletes, sequential numbering enforced server-side, all mutations audit-logged.
+This is the standard remediation for linter lints 0028/0029.
 
-Ready to build on approval.
+## Deliverable
+
+One migration `supabase/migrations/<ts>_security_hardening.sql` covering all six fixes, plus:
+- New view `public.customer_directory` with `security_invoker=on` and appropriate GRANTs.
+- Small edits in `src/components/customer-search.tsx` and any collector route currently selecting from `customers` directly, switching to `customer_directory`.
+- After applying, call `manage_security_finding` with `mark_as_fixed` on all six `internal_id`s and update `@security-memory` with the new posture (admin-only realtime, role-scoped customer/receipt reads, locked-down definer grants).
+
+## Technical notes
+
+- The `realtime.messages` policy uses `realtime.topic()` for topic-aware checks if we later need per-topic scoping; the initial admin-only policy is simpler and matches current usage.
+- Revoking `EXECUTE` from `PUBLIC` is what clears the linter — re-granting to `authenticated` is fine because the body-level `has_role` check is the real authorization boundary.
+- No data migration needed; only policies, grants, and one view.
+
+Shall I proceed?
