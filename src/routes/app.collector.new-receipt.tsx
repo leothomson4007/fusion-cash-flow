@@ -78,48 +78,43 @@ function NewReceiptPage() {
 
   return (
     <div className="max-w-md mx-auto space-y-4">
-      {false ? null : (
-        <></>
-      ) : (
-        <>
-          <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}><ArrowLeft className="h-4 w-4 mr-1" />Change customer</Button>
-          <Card className="shadow-card">
-            <CardContent className="p-5 space-y-3">
-              <div>
-                <div className="text-lg font-semibold">{customer.full_name}</div>
-                <div className="text-xs text-muted-foreground">{customer.customer_no} · {customer.area ?? "—"}</div>
-              </div>
-              <div className="flex justify-between rounded-md bg-muted p-3 text-sm">
-                <span className="text-muted-foreground">Current balance</span>
-                <Money value={customer.balance} tone={Number(customer.balance) > 0 ? "destructive" : "success"} />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-5 space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground">Amount received (Rs.)</Label>
-                <Input type="number" inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className="h-16 text-3xl text-center font-semibold" />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {[500, 1000, 1500, 2000, 2500, 3000].map((v) => (
-                  <Button key={v} type="button" variant="outline" onClick={() => setAmount(String(v))}>{v}</Button>
-                ))}
-              </div>
-              <div className="space-y-1.5">
-                <Label>Note (optional)</Label>
-                <Input value={note} onChange={(e) => setNote(e.target.value)} />
-              </div>
-              <Button onClick={submit} disabled={saving} className="w-full h-12 text-base">
-                {saving ? "Creating…" : "Create cash receipt"}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                The receipt is sequential and locked the moment it's created.
-              </p>
-            </CardContent>
-          </Card>
-        </>
-      )}
+      <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}><ArrowLeft className="h-4 w-4 mr-1" />Change customer</Button>
+      <Card className="shadow-card">
+        <CardContent className="p-5 space-y-3">
+          <div>
+            <div className="text-lg font-semibold">{customer.full_name}</div>
+            <div className="text-xs text-muted-foreground">{customer.customer_no} · {customer.area ?? "—"}</div>
+          </div>
+          <div className="flex justify-between rounded-md bg-muted p-3 text-sm">
+            <span className="text-muted-foreground">Current balance</span>
+            <Money value={customer.balance} tone={Number(customer.balance) > 0 ? "destructive" : "success"} />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="shadow-card">
+        <CardContent className="p-5 space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Amount received (Rs.)</Label>
+            <Input type="number" inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className="h-16 text-3xl text-center font-semibold" />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[500, 1000, 1500, 2000, 2500, 3000].map((v) => (
+              <Button key={v} type="button" variant="outline" onClick={() => setAmount(String(v))}>{v}</Button>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Note (optional)</Label>
+            <Input value={note} onChange={(e) => setNote(e.target.value)} />
+          </div>
+          <Button onClick={submit} disabled={saving} className="w-full h-12 text-base">
+            {saving ? "Creating…" : "Create cash receipt"}
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            The receipt is sequential and locked the moment it's created.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
