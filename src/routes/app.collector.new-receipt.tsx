@@ -58,13 +58,28 @@ function NewReceiptPage() {
     );
   }
 
+  if (!customer) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">Pick a customer</h2>
+          <p className="text-sm text-muted-foreground">
+            Search by name, ID, phone, address, area or package. Use filters to narrow the list.
+          </p>
+        </div>
+        <Card className="shadow-card">
+          <CardContent className="p-3 sm:p-4">
+            <CustomerSearch autoFocus onSelect={setCustomer} />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto space-y-4">
-      {!customer ? (
-        <Card className="shadow-card">
-          <CardHeader><CardTitle className="text-base">Pick a customer</CardTitle></CardHeader>
-          <CardContent><CustomerSearch autoFocus onSelect={setCustomer} /></CardContent>
-        </Card>
+      {false ? null : (
+        <></>
       ) : (
         <>
           <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}><ArrowLeft className="h-4 w-4 mr-1" />Change customer</Button>
