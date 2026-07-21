@@ -91,11 +91,14 @@ export function ReceiptCard({
   const handleDownloadImage = async () => {
     setBusy(true);
     try {
-      const { default: html2canvas } = await import("html2canvas");
       const node = printRef.current;
       if (!node) return;
-      const canvas = await html2canvas(node, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-      const dataUrl = canvas.toDataURL("image/png");
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(node, {
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+      });
       const a = document.createElement("a");
       a.href = dataUrl;
       a.download = `${receipt.receipt_no}.png`;
@@ -104,12 +107,13 @@ export function ReceiptCard({
       a.remove();
       toast.success("Receipt image saved");
     } catch (e) {
-      console.error(e);
+      console.error("Save image failed:", e);
       toast.error("Couldn't save image — try Print instead");
     } finally {
       setBusy(false);
     }
   };
+
 
   return (
     <div className="space-y-3">
