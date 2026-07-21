@@ -297,6 +297,7 @@ export type Database = {
     Views: {
       customer_balances: {
         Row: {
+          address: string | null
           area: string | null
           balance: number | null
           billing_day: number | null
@@ -313,6 +314,7 @@ export type Database = {
           total_paid: number | null
         }
         Insert: {
+          address?: string | null
           area?: string | null
           balance?: never
           billing_day?: number | null
@@ -329,6 +331,7 @@ export type Database = {
           total_paid?: never
         }
         Update: {
+          address?: string | null
           area?: string | null
           balance?: never
           billing_day?: number | null
@@ -447,76 +450,41 @@ export type Database = {
         }
         Returns: undefined
       }
-      admin_update_receipt:
-        | {
-            Args: {
-              _amount: number
-              _id: string
-              _note: string
-              _payment_type: Database["public"]["Enums"]["payment_type"]
-              _reason: string
-            }
-            Returns: {
-              amount: number
-              cancelled_reason: string | null
-              collector_id: string | null
-              created_at: string
-              created_by: string
-              customer_id: string
-              id: string
-              note: string | null
-              payment_reference: string | null
-              payment_type: Database["public"]["Enums"]["payment_type"]
-              previous_due: number | null
-              receipt_no: string
-              remaining_due: number | null
-              seq: number
-              status: Database["public"]["Enums"]["receipt_status"]
-              updated_at: string
-              year: number
-            }
-            SetofOptions: {
-              from: "*"
-              to: "receipts"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              _amount: number
-              _id: string
-              _note: string
-              _payment_reference?: string
-              _payment_type: Database["public"]["Enums"]["payment_type"]
-              _reason: string
-            }
-            Returns: {
-              amount: number
-              cancelled_reason: string | null
-              collector_id: string | null
-              created_at: string
-              created_by: string
-              customer_id: string
-              id: string
-              note: string | null
-              payment_reference: string | null
-              payment_type: Database["public"]["Enums"]["payment_type"]
-              previous_due: number | null
-              receipt_no: string
-              remaining_due: number | null
-              seq: number
-              status: Database["public"]["Enums"]["receipt_status"]
-              updated_at: string
-              year: number
-            }
-            SetofOptions: {
-              from: "*"
-              to: "receipts"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      admin_update_receipt: {
+        Args: {
+          _amount: number
+          _id: string
+          _note: string
+          _payment_reference?: string
+          _payment_type: Database["public"]["Enums"]["payment_type"]
+          _reason: string
+        }
+        Returns: {
+          amount: number
+          cancelled_reason: string | null
+          collector_id: string | null
+          created_at: string
+          created_by: string
+          customer_id: string
+          id: string
+          note: string | null
+          payment_reference: string | null
+          payment_type: Database["public"]["Enums"]["payment_type"]
+          previous_due: number | null
+          receipt_no: string
+          remaining_due: number | null
+          seq: number
+          status: Database["public"]["Enums"]["receipt_status"]
+          updated_at: string
+          year: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "receipts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       admin_upsert_customer: {
         Args: {
           _address: string
@@ -564,74 +532,40 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       collector_expected_cash: { Args: { _uid: string }; Returns: number }
-      create_receipt:
-        | {
-            Args: {
-              _amount: number
-              _customer_id: string
-              _note?: string
-              _payment_type?: Database["public"]["Enums"]["payment_type"]
-            }
-            Returns: {
-              amount: number
-              cancelled_reason: string | null
-              collector_id: string | null
-              created_at: string
-              created_by: string
-              customer_id: string
-              id: string
-              note: string | null
-              payment_reference: string | null
-              payment_type: Database["public"]["Enums"]["payment_type"]
-              previous_due: number | null
-              receipt_no: string
-              remaining_due: number | null
-              seq: number
-              status: Database["public"]["Enums"]["receipt_status"]
-              updated_at: string
-              year: number
-            }
-            SetofOptions: {
-              from: "*"
-              to: "receipts"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
-        | {
-            Args: {
-              _amount: number
-              _customer_id: string
-              _note?: string
-              _payment_reference?: string
-              _payment_type?: Database["public"]["Enums"]["payment_type"]
-            }
-            Returns: {
-              amount: number
-              cancelled_reason: string | null
-              collector_id: string | null
-              created_at: string
-              created_by: string
-              customer_id: string
-              id: string
-              note: string | null
-              payment_reference: string | null
-              payment_type: Database["public"]["Enums"]["payment_type"]
-              previous_due: number | null
-              receipt_no: string
-              remaining_due: number | null
-              seq: number
-              status: Database["public"]["Enums"]["receipt_status"]
-              updated_at: string
-              year: number
-            }
-            SetofOptions: {
-              from: "*"
-              to: "receipts"
-              isOneToOne: true
-              isSetofReturn: false
-            }
-          }
+      create_receipt: {
+        Args: {
+          _amount: number
+          _customer_id: string
+          _note?: string
+          _payment_reference?: string
+          _payment_type?: Database["public"]["Enums"]["payment_type"]
+        }
+        Returns: {
+          amount: number
+          cancelled_reason: string | null
+          collector_id: string | null
+          created_at: string
+          created_by: string
+          customer_id: string
+          id: string
+          note: string | null
+          payment_reference: string | null
+          payment_type: Database["public"]["Enums"]["payment_type"]
+          previous_due: number | null
+          receipt_no: string
+          remaining_due: number | null
+          seq: number
+          status: Database["public"]["Enums"]["receipt_status"]
+          updated_at: string
+          year: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "receipts"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       current_user_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
