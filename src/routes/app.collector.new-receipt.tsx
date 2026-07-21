@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,53 +58,63 @@ function NewReceiptPage() {
     );
   }
 
+  if (!customer) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-3">
+        <div>
+          <h2 className="text-xl font-semibold">Pick a customer</h2>
+          <p className="text-sm text-muted-foreground">
+            Search by name, ID, phone, address, area or package. Use filters to narrow the list.
+          </p>
+        </div>
+        <Card className="shadow-card">
+          <CardContent className="p-3 sm:p-4">
+            <CustomerSearch autoFocus onSelect={setCustomer} />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto space-y-4">
-      {!customer ? (
-        <Card className="shadow-card">
-          <CardHeader><CardTitle className="text-base">Pick a customer</CardTitle></CardHeader>
-          <CardContent><CustomerSearch autoFocus onSelect={setCustomer} /></CardContent>
-        </Card>
-      ) : (
-        <>
-          <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}><ArrowLeft className="h-4 w-4 mr-1" />Change customer</Button>
-          <Card className="shadow-card">
-            <CardContent className="p-5 space-y-3">
-              <div>
-                <div className="text-lg font-semibold">{customer.full_name}</div>
-                <div className="text-xs text-muted-foreground">{customer.customer_no} · {customer.area ?? "—"}</div>
-              </div>
-              <div className="flex justify-between rounded-md bg-muted p-3 text-sm">
-                <span className="text-muted-foreground">Current balance</span>
-                <Money value={customer.balance} tone={Number(customer.balance) > 0 ? "destructive" : "success"} />
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-card">
-            <CardContent className="p-5 space-y-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wider text-muted-foreground">Amount received (Rs.)</Label>
-                <Input type="number" inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className="h-16 text-3xl text-center font-semibold" />
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {[500, 1000, 1500, 2000, 2500, 3000].map((v) => (
-                  <Button key={v} type="button" variant="outline" onClick={() => setAmount(String(v))}>{v}</Button>
-                ))}
-              </div>
-              <div className="space-y-1.5">
-                <Label>Note (optional)</Label>
-                <Input value={note} onChange={(e) => setNote(e.target.value)} />
-              </div>
-              <Button onClick={submit} disabled={saving} className="w-full h-12 text-base">
-                {saving ? "Creating…" : "Create cash receipt"}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                The receipt is sequential and locked the moment it's created.
-              </p>
-            </CardContent>
-          </Card>
-        </>
-      )}
+      <Button variant="ghost" size="sm" onClick={() => setCustomer(null)}><ArrowLeft className="h-4 w-4 mr-1" />Change customer</Button>
+      <Card className="shadow-card">
+        <CardContent className="p-5 space-y-3">
+          <div>
+            <div className="text-lg font-semibold">{customer.full_name}</div>
+            <div className="text-xs text-muted-foreground">{customer.customer_no} · {customer.area ?? "—"}</div>
+          </div>
+          <div className="flex justify-between rounded-md bg-muted p-3 text-sm">
+            <span className="text-muted-foreground">Current balance</span>
+            <Money value={customer.balance} tone={Number(customer.balance) > 0 ? "destructive" : "success"} />
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="shadow-card">
+        <CardContent className="p-5 space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground">Amount received (Rs.)</Label>
+            <Input type="number" inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className="h-16 text-3xl text-center font-semibold" />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {[500, 1000, 1500, 2000, 2500, 3000].map((v) => (
+              <Button key={v} type="button" variant="outline" onClick={() => setAmount(String(v))}>{v}</Button>
+            ))}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Note (optional)</Label>
+            <Input value={note} onChange={(e) => setNote(e.target.value)} />
+          </div>
+          <Button onClick={submit} disabled={saving} className="w-full h-12 text-base">
+            {saving ? "Creating…" : "Create cash receipt"}
+          </Button>
+          <p className="text-xs text-muted-foreground text-center">
+            The receipt is sequential and locked the moment it's created.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
